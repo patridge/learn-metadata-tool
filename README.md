@@ -16,7 +16,7 @@ A proof-of-concept was developed that works when executed in the browser develop
 1. Inside the bookmark edit pop-up, set the address to this large block of JavaScript. (It's ugly, but that's how bookmarklets often look.)
 
 ```js
-javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll("meta[name='ms.author']")[0].attributes.content.value;await navigator.clipboard.writeText(msAuthorMetaTagValue);window.alert(`Copied '${msAuthorMetaTagValue}' to clipboard.`);})()
+javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll("meta[name='ms.author']")[0].attributes.content.value;let gitHubLocationLive = document.querySelectorAll("meta[name='original_ref_skeleton_git_url']")[0].attributes["content"].value;let gitHubLocationMaster = gitHubLocationLive.replace("/live/", "/master/");await navigator.clipboard.writeText(msAuthorMetaTagValue);window.alert(`Copied '${msAuthorMetaTagValue}' to clipboard.`);window.open(gitHubLocationMaster, "_blank")})()
 ```
 
 1. Name your bookmark something like `Get ms.author`, so you can find it easily in your bookmarks.
