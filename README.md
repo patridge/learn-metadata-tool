@@ -16,7 +16,7 @@ A proof-of-concept was developed that works when executed in the browser develop
 1. Inside the bookmark edit pop-up, set the address to this large block of JavaScript. (It's ugly, but that's how bookmarklets often look.)
 
 ```js
-javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll("meta[name='ms.author']")[0].attributes.content.value;await navigator.clipboard.writeText(msAuthorMetaTagValue)})()
+javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll("meta[name='ms.author']")[0].attributes.content.value;await navigator.clipboard.writeText(msAuthorMetaTagValue);window.alert(`Copied '${msAuthorMetaTagValue}' to clipboard.`);})()
 ```
 
 1. Name your bookmark something like `Get ms.author`, so you can find it easily in your bookmarks.

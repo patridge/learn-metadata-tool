@@ -3,4 +3,5 @@ javascript: (async function () {
     let msAuthorMetaTagValue = document.querySelectorAll("meta[name='ms.author']")[0].attributes["content"].value;
 
     await navigator.clipboard.writeText(msAuthorMetaTagValue);
+    window.alert(`Copied '${msAuthorMetaTagValue}' to clipboard.`);
 })();
