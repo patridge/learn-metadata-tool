@@ -2,7 +2,8 @@ let gatherMetadataButton = document.getElementById("gatherMetadata");
 let msAuthorSpan = document.getElementById("msAuthor");
 let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
-let originalGitUrlSpan = document.getElementById("repoUrl");
+let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
+let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
 
 let displayMetadata = async function (metadata) {
     console.log("Content script received: " + metadata);
@@ -10,7 +11,8 @@ let displayMetadata = async function (metadata) {
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     gitHubAuthorSpan.textContent = metadata.gitHubAuthorMetaTagValue;
     msDateSpan.textContent = metadata.msDateMetaTagValue;
-    originalGitUrlSpan.textContent = metadata.gitHubLocationMaster;
+    contentYamlGitUrlAnchor.href = metadata.gitHubYamlLocationMaster;
+    contentMarkdownGitUrlAnchor.href = metadata.gitHubMarkdownLocationMaster;
 
     await navigator.clipboard.writeText(metadata.msAuthorMetaTagValue);
     // window.alert(`Copied '${metadata.msAuthorMetaTagValue}' to clipboard.`);
