@@ -1,0 +1,32 @@
+{
+  "name": "Microsoft Learn maintenance tool",
+  "short_name": "LearnTool",
+  "description": "Helping you maintain content on Microsoft Learn. Extract metadata from Learn content pages for triage purposes.",
+  "version": "0.2.1",
+  "permissions": [
+    "activeTab",
+    "declarativeContent"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "page_action": {
+    "default_popup": "extension-popup.html",
+    "default_icon": {
+      "16": "images/learn-tool16.png",
+      "32": "images/learn-tool32.png",
+      "48": "images/learn-tool48.png",
+      "128": "images/learn-tool128.png"
+    }
+  },
+  "icons": {
+    "16": "images/learn-tool16.png",
+    "32": "images/learn-tool32.png",
+    "48": "images/learn-tool48.png",
+    "128": "images/learn-tool128.png"
+  },
+  "manifest_version": 2
+}

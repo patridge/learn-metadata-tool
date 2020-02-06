@@ -4,6 +4,17 @@ Determine the author of a given Microsoft Learn page. This tool is used by the c
 
 ## Current state
 
+### v0.2.1: Chrome extension
+
+Extract some of the page's metadata into a Chrome extension pop-up display.
+
+This is the information currently being extracted:
+
+* `ms.author`
+* `author`
+* `ms.date`
+* modified version of `original_ref_skeleton_git_url` (swapped to the `master` branch of the repo)
+
 ### v0.1.0: Bookmarklet
 
 A proof-of-concept was developed that works when executed in the browser developer tools console. If you really needed this functionality in its current form, it could be encapsulated into a bookmarklet like this. (Edit the bot name prefixes in the resulting JavaScript first, though.)
@@ -29,13 +40,17 @@ javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll(
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.2+: Chrome extension
+### v0.2+: Chrome extension and more data
 
 * Host functionality in a new extension
-
-### v0.3+: More data!
-
 * Allow retrieving more metadata, with easy copying of fields
+
+### v0.3+: Auto retrieve and more useful display
+
+* Pull metadata immediately without a button
+* Offer ways of quickly consuming metadata
+  * Copy buttons per field
+  * GitHub page as a link
 
 ### v0.4+: Customization
 
