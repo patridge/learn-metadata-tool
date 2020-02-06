@@ -32,17 +32,15 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     }
 });
 
-gatherMetadataButton.onclick = function(element) {
-    chrome.tabs.query({ active: true, currentWindow: true },
-        function(tabs) {
-            chrome.tabs.executeScript(
-                tabs[0].id,
-                {
-                    //original_ref_skeleton_git_url
-                    // code: 'console.log("hola!!!");', //commentMinimizer.hideOutdatedBotComments();
-                    file: "get-author.js"
-                }
-            );
-        }
-    );
-};
+chrome.tabs.query({ active: true, currentWindow: true },
+    function(tabs) {
+        chrome.tabs.executeScript(
+            tabs[0].id,
+            {
+                //original_ref_skeleton_git_url
+                // code: 'console.log("hola!!!");', //commentMinimizer.hideOutdatedBotComments();
+                file: "get-author.js"
+            }
+        );
+    }
+);
