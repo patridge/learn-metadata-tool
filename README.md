@@ -1,57 +1,35 @@
 # Learn metadata query tool
 
-Determine the author of a given Microsoft Learn page. This tool is used by the content team to help triage Minimize GitHub comment noise in your pull requests from bots using this Google Chrome extension.
+Determine the author of a given Microsoft Learn page. This tool is used by the content team to help triage user-reported feedback to the right maintainer.
 
 ## Current state
 
-### v0.2.1: Chrome extension
+### v0.2.5: Chrome extension
 
-Extract some of the page's metadata into a Chrome extension pop-up display.
+Extract the critical page metadata fields into a Chrome extension pop-up display, with clickable links to the YAML and Markdown pages for editing directly in GitHub.
 
 This is the information currently being extracted:
 
 * `ms.author`
 * `author`
 * `ms.date`
-* modified version of `original_ref_skeleton_git_url` (swapped to the `master` branch of the repo)
+* modified version of `original_ref_skeleton_git_url` for YAML and Markdown pages (modified for branch)
 
-### v0.1.0: Bookmarklet
-
-A proof-of-concept was developed that works when executed in the browser developer tools console. If you really needed this functionality in its current form, it could be encapsulated into a bookmarklet like this. (Edit the bot name prefixes in the resulting JavaScript first, though.)
-
-1. Create a bookmark for any page, even this one.
-1. Find the new bookmark and edit it. If you just bookmarked this page in Chrome, click the **More...** button to edit the bookmark address.
-
-    ![Screenshot of the initial bookmark addition pop-up in Windows Chrome](media/new-bookmark-windows-chrome.png)
-
-1. Inside the bookmark edit pop-up, set the address to this large block of JavaScript. (It's ugly, but that's how bookmarklets often look.)
-
-```js
-javascript:(async function(){let msAuthorMetaTagValue=document.querySelectorAll("meta[name='ms.author']")[0].attributes.content.value;let gitHubLocationLive = document.querySelectorAll("meta[name='original_ref_skeleton_git_url']")[0].attributes["content"].value;let gitHubLocationMaster = gitHubLocationLive.replace("/live/", "/master/");await navigator.clipboard.writeText(msAuthorMetaTagValue);window.alert(`Copied '${msAuthorMetaTagValue}' to clipboard.`);window.open(gitHubLocationMaster, "_blank")})()
-```
-
-1. Name your bookmark something like `Get ms.author`, so you can find it easily in your bookmarks.
-
-    ![Screenshot of the bookmark edit pop-up after setting the fields to match these directions.](media/edit-bookmark-windows-chrome.png)
-
-1. Now, when you are viewing a Microsoft Learn page (and likely many other Microsoft Docs pages), just click that bookmark you created. It will find the `ms.author` metadata tag and copy the resulting author value go through the page and submit the requests to mark all prior bot comments as hidden, with the reason "Outdated".
+    ![Screenshot showing the Microsoft Learn maintenance tool Chrome extension with a page's metadata loaded.](media/extension-screenshot-large-v0.2.5.png)
 
 ## Roadmap
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.2+: Chrome extension and more data
+### v0.3+: Easy copying of field data
 
-* Host functionality in a new extension
-* Allow retrieving more metadata, with easy copying of fields
-
-### v0.3+: Auto retrieve and more useful display
-
-* Pull metadata immediately without a button
-* Offer ways of quickly consuming metadata
-  * Copy buttons per field
-  * GitHub page as a link
+* Copy buttons per metadata field
 
 ### v0.4+: Customization
 
 * Allow customizing which metadata fields are important to you
+
+### v???: The Future
+
+* Offer interactions with Azure DevOps work items directly
+* Offer area path interpretation or intelligent guess for work item categorization
