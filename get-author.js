@@ -61,8 +61,9 @@
             );
         });
     };
+    
+    // storageLocalRemoveAsync([ location ]);
     let getCurrentPageMetadata = function () {
-        // Didn't get anything back from cache. Go get it from the page.
         let metaTags = document.getElementsByTagName("meta");
         let msAuthor = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0].getAttribute("content");
         let author = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0].getAttribute("content");
@@ -86,11 +87,20 @@
         let cacheAddition = {};
         cacheAddition[location] = pageMetadata;
         await storageLocalSetAsync(cacheAddition);
-    }
+    };
+    let sendUpdateRequest = function (pageMetadata) {
+        chrome.runtime.sendMessage(
+            {
+                method: 'metadataCollected',
+                data: pageMetadata
+            },
+            function (response) {
+                console.log(`Metadata handled: ${response.result}`);
+            }
+        );
+    };
 
     let location = document.location.href;
-
-    // storageLocalRemoveAsync([ location ]);
 
     var pageMetadata = await (async function () {
         var cachedMetadata = await storageLocalGetAsync([ location ]);
@@ -106,20 +116,13 @@
         wasPageMetadataCached = true;
     }
 
-    chrome.runtime.sendMessage(
-        {
-            method: 'metadataCollected',
-            data: pageMetadata
-        },
-        function (response) {
-            console.log(`Metadata handled: ${response.result}`);
-        }
-    );
+    sendUpdateRequest(pageMetadata);
 
     if (wasPageMetadataCached) {
         // Get the latest from the page and re-cache it.
         await delay(5000);
         pageMetadata = getCurrentPageMetadata();
         cachePageMetadata(location, pageMetadata);
+        sendUpdateRequest(pageMetadata);
     }
 })();
