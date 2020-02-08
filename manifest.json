@@ -5,7 +5,8 @@
   "version": "0.2.4",
   "permissions": [
     "activeTab",
-    "declarativeContent"
+    "declarativeContent",
+    "storage"
   ],
   "background": {
     "scripts": [
