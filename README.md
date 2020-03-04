@@ -50,10 +50,6 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.3+: Easy copying of field data
-
-* Copy buttons per metadata field
-
 ### v0.4+: Customization
 
 * Allow customizing which metadata fields are important to you

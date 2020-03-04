@@ -65,10 +65,14 @@
     // storageLocalRemoveAsync([ location ]);
     let getCurrentPageMetadata = function () {
         let metaTags = document.getElementsByTagName("meta");
-        let msAuthor = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0].getAttribute("content");
-        let author = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0].getAttribute("content");
-        let msDate = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0].getAttribute("content");
-        let gitUrl = [...metaTags].filter(meta => meta.getAttribute("name") === "original_ref_skeleton_git_url")[0].getAttribute("content");
+        let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
+        let msAuthor = msAuthorTag ? msAuthorTag.getAttribute("content") : "";
+        let authorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0];
+        let author = authorTag ? authorTag.getAttribute("content") : "";
+        let msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
+        let msDate = msDateTag ? msDateTag.getAttribute("content") : "";
+        let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_ref_skeleton_git_url")[0];
+        let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
         let gitYamlMasterUrl = gitUrl.replace("/live/", "/master/");
         let gitMarkdownMasterUrl = gitYamlMasterUrl.endsWith("/index.yml")
             ? gitYamlMasterUrl
