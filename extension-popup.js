@@ -9,11 +9,19 @@ let displayMetadata = async function (metadata) {
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     gitHubAuthorSpan.textContent = metadata.gitHubAuthorMetaTagValue;
     msDateSpan.textContent = metadata.msDateMetaTagValue;
-    contentYamlGitUrlAnchor.href = metadata.gitHubYamlLocationMaster;
-    contentMarkdownGitUrlAnchor.href = metadata.gitHubMarkdownLocationMaster;
 
-    // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
-    await navigator.clipboard.writeText(metadata.msAuthorMetaTagValue).catch(error => console.log("Error while trying to copy to clipboard", error));
+    if (metadata.gitHubYamlLocation) {
+        contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
+    }
+    else {
+        contentYamlGitUrlAnchor.removeAttribute('href');
+    }
+    if (metadata.gitHubMarkdownLocation) {
+        contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
+    }
+    else {
+        contentMarkdownGitUrlAnchor.removeAttribute('href');
+    }
 };
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
