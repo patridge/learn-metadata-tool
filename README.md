@@ -1,8 +1,8 @@
 # Learn metadata maintenance tool
 
-Determine the author of a given Microsoft Learn page. This tool is used by the content team to help triage user-reported feedback to the right maintainer.
+Determine the author of a given Microsoft Learn or Microsoft Docs page. And quickly navigate to the content in GitHub to propose edits. This tool was created for the Microsoft Learn content team to help triage user-reported feedback to the right maintainer, but anyone is welcome to use it if it helps them.
 
-![Screenshot showing the Microsoft Learn maintenance tool Chrome extension with a page's metadata loaded.](media/extension-screenshot-large-v0.2.5.png)
+![Screenshot of the Microsoft Learn maintenance tool Chrome extension showing a page's author, date, and edit link metadata loaded.](media/extension-screenshot-large-v0.2.5.png)
 
 ## Features
 
@@ -13,7 +13,7 @@ This is the information currently being extracted:
 * `ms.author`
 * `author`
 * `ms.date`
-* modified version of `original_ref_skeleton_git_url` for YAML and Markdown pages (modified for branch)
+* Edit URL(s), either `original_content_git_url` or a modified version of `original_ref_skeleton_git_url` for YAML and/or Markdown pages
 
 ## Installation
 
@@ -50,7 +50,7 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.4+: Customization
+### v0.5+: Customization
 
 * Allow customizing which metadata fields are important to you
 
