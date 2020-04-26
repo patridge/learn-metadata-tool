@@ -91,7 +91,7 @@
             else {
                 let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
                 // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
-                // Use the raw URL for Markdown edit location. (YAML edit locaiton doesn't exist.)
+                // Use the raw URL for Markdown edit location. (YAML edit location doesn't exist.)
 
                 let gitMarkdownEditUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
                 let gitYamlEditUrl = null; // ?not applicable outside Learn?
