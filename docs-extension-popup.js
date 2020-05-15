@@ -1,4 +1,4 @@
-let gatherMetadataButton = document.getElementById("gatherMetadata");
+// NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
 let msAuthorSpan = document.getElementById("msAuthor");
 let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
@@ -50,13 +50,23 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     }
 });
 
+// Execute a script in the current tab.
 chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
-        chrome.tabs.executeScript(
-            tabs[0].id,
-            {
-                file: "get-author.js"
-            }
-        );
+        // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
+        const microsoftLearnPageScript = "get-author.js";
+        let tempAnchor = document.createElement("a");
+        tempAnchor.href = tabs[0].url;
+        let tabId = tabs[0].id;
+        // TODO: Remove logging after figuring out the structure of tabs and each tab item.
+        console.log({ tab0: tabs[0], tabs: tabs, hostname: tempAnchor.hostname });
+        if (tempAnchor.hostname.endsWith("docs.microsoft.com")) {
+            chrome.tabs.executeScript(
+                tabId,
+                {
+                    file: microsoftLearnPageScript
+                }
+            );
+        }
     }
 );
