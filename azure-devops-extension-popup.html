@@ -6,15 +6,13 @@
     <script defer src="/js/all.min.js"></script>
 </head>
 <body>
-    <table>
+    <table style="width: 250px">
         <tr>
-            <td>UID</td><td><span class="copy-field-target" id="uid">...</span></td><td><button class="copy-field-btn fas fa-clipboard"></button></td>
+            <!-- TODO: swap to a field or styling where we can shorten the display of lengthy UIDs. (Then remove width style above.) -->
+            <td>UID</td><td><a target="_blank" id="contentUrl"><span class="copy-field-target" style="overflow: hidden;" id="uid">...</span></a></td><td><button class="copy-field-btn fas fa-clipboard"></button></td>
         </tr>
         <tr>
-            <td>ms.date</td><td><span id="msDate">...</span></td>
-        </tr>
-        <tr>
-            <td>repo URL</td><td><a target="_blank" id="repoUrlMarkdown">MD</a> (<a target="_blank" id="repoUrlYaml">YAML</a>)</td>
+            <td colspan="2"><a target="_blank" id="relatedWorkItemsQueryUrl">Related issues</a> (<a target="_blank" id="relatedVerbatimsQueryUrl">Verbatims</a>)</td>
         </tr>
     </table>
     <script src="azure-devops-extension-popup.js"></script>
