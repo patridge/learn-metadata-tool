@@ -1,4 +1,6 @@
-let setPopUpFromCurrentTab = function (tabId) {
+let setPopUpByTabId = function (tabId) {
+    if (!tabId) { return; }
+
     chrome.tabs.get(tabId, function (tab) {
         // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
         let tabId = tab.id;
@@ -19,6 +21,14 @@ let setPopUpFromCurrentTab = function (tabId) {
         }
     });
 }
+let setPopUpViaActiveTabQuery = function () {
+    chrome.tabs.query({ active: true, currentWindow: true },
+        function(tabs) {
+            let tabId = tabs[0]?.id;
+            setPopUpByTabId(tabId);
+        }
+    );
+}
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         // TODO: Find out if conditions in the array are AND or OR. If OR, we can combine them both (possible example evidence for OR: https://github.com/kudos/combine.fm/blob/8ea8b4d279bf411064cf1328710e8a343fe021d5/chrome/src/background.js#L5-L42).
@@ -37,7 +47,9 @@ chrome.runtime.onInstalled.addListener(function() {
                         },
                     })
                 ],
-                actions: [new chrome.declarativeContent.ShowPageAction()]
+                actions: [
+                    new chrome.declarativeContent.ShowPageAction()
+                ]
             },
             {
                 conditions: [
@@ -51,25 +63,22 @@ chrome.runtime.onInstalled.addListener(function() {
                         },
                     })
                 ],
-                actions: [(() => {
-                    // NOTE: These calls may fire immediately after the extension is loaded, not when deciding when to show something on a given tab. (Maybe they only fire when an applicable tab is already open???)
-                    return new chrome.declarativeContent.ShowPageAction();
-                })()]
+                actions: [
+                    new chrome.declarativeContent.ShowPageAction()
+                ]
+                // actions: [(() => {
+                //     // NOTE: These calls may fire immediately after the extension is loaded, not when deciding when to show something on a given tab. (Maybe they only fire when an applicable tab is already open???)
+                //     setPopUpViaActiveTabQuery();
+                //     return new chrome.declarativeContent.ShowPageAction();
+                // })()]
             }
         ]);
 
-        // NOTE: chrome.browserAction is still saying it doesn't have setPopup. Maybe it's not available yet?
+        // TODO: This still might not handle navigation from a page without a work item to a page that has a work item.
         chrome.tabs.onActivated.addListener(function (activeInfo) {
             // window.alert(`tab activated (ID: ${activeInfo.tabId}, windowId: ${activeInfo.windowId})`);
-            setPopUpFromCurrentTab(activeInfo.tabId);
+            setPopUpByTabId(activeInfo.tabId);
         });
-        // Set the pop-up for the first run of things. After this, the `onActivated` should do the work of keeping it maintained.
-        chrome.tabs.query({ active: true, currentWindow: true },
-            function(tabs) {
-                let tabId = tabs[0].id;
-                setPopUpFromCurrentTab(tabId);
-            }
-        );
         // TODO: Add a default pop-up that isn't set for a page, in case we haven't run anything yet.
     });
 });
