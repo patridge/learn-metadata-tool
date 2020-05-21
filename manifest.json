@@ -2,7 +2,7 @@
   "name": "Microsoft Learn maintenance tool",
   "short_name": "LearnTool",
   "description": "Helping you maintain content on Microsoft Learn and Docs. Extract metadata from content pages for editing or triage purposes.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "permissions": [
     // TODO: Research a match pattern instead of `activeTab` (per note in developer dashboard permission justifcation section): https://developer.chrome.com/extensions/match_patterns
     "activeTab",
