@@ -74,10 +74,16 @@ chrome.runtime.onInstalled.addListener(function() {
             }
         ]);
 
-        // TODO: This still might not handle navigation from a page without a work item to a page that has a work item.
+        // NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
         chrome.tabs.onActivated.addListener(function (activeInfo) {
-            // window.alert(`tab activated (ID: ${activeInfo.tabId}, windowId: ${activeInfo.windowId})`);
             setPopUpByTabId(activeInfo.tabId);
+        });
+        // NOTE: This handles when you navigate between pages _within_ a tab to readdress which pop-up is shown. (Sometimes, if a page didn't need a pop-up and you navigated to one that should have a pop-up, it wasn't being shown.)
+        chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+            // This gets called a lot! Restrict to only onUpdated calls where the URL in the tab was changed.
+            if (changeInfo.url) {
+                setPopUpByTabId(tabId);
+            }
         });
         // TODO: Add a default pop-up that isn't set for a page, in case we haven't run anything yet.
     });
