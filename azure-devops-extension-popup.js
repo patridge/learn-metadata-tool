@@ -4,6 +4,18 @@ let contentUrl = document.getElementById("contentUrl");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
 
+let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
+copyButtons.forEach(btn => {
+    btn.onclick = async function(element) {
+        // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
+        let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
+        let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
+        let copyValue = copyTarget && copyTarget.innerText;
+        // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
+        await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
+    };
+});
+
 let displayWorkItemData = async function (workItemData) {
     // TODO: Figure out why it doesn't display properly for module work items (e.g., https://ceapex.visualstudio.com/Microsoft%20Learn/_workitems/edit/51164).
     if (workItemData.UID) {
@@ -47,18 +59,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     switch (request.method) {
         case "workItemCollected":
             await displayWorkItemData(request.data);
-
-            let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
-            copyButtons.forEach(btn => {
-                btn.onclick = async function(element) {
-                    // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
-                    let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
-                    let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
-                    let copyValue = copyTarget && copyTarget.innerText;
-                    // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
-                    await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
-                };
-            });
 
             sendResponse(
                 {
