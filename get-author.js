@@ -91,7 +91,7 @@
             else {
                 let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
                 // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
-                // Use the raw URL for Markdown edit location. (YAML edit locaiton doesn't exist.)
+                // Use the raw URL for Markdown edit location. (YAML edit location doesn't exist.)
 
                 let gitMarkdownEditUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
                 let gitYamlEditUrl = null; // ?not applicable outside Learn?
@@ -111,12 +111,12 @@
         };
     };
     let cachePageMetadata = async function (location, pageMetadata) {
-        pageMetadata = getCurrentPageMetadata();
+        // ???pageMetadata = getCurrentPageMetadata();
         let cacheAddition = {};
         cacheAddition[location] = pageMetadata;
         await storageLocalSetAsync(cacheAddition);
     };
-    let sendUpdateRequest = function (pageMetadata) {
+    let sendPopUpUpdateRequest = function (pageMetadata) {
         chrome.runtime.sendMessage(
             {
                 method: 'metadataCollected',
@@ -135,12 +135,14 @@
 
     let location = document.location.href;
 
+    // Try to get cached metadata as a placeholder.
     var pageMetadata = await (async function () {
         var cachedMetadata = await storageLocalGetAsync([ location ]);
         return cachedMetadata[location];
     })();
     var wasPageMetadataCached = false;
 
+    // If no cached data, get current.
     if (!pageMetadata) {
         pageMetadata = getCurrentPageMetadata();
         cachePageMetadata(location, pageMetadata);
@@ -149,13 +151,13 @@
         wasPageMetadataCached = true;
     }
 
-    sendUpdateRequest(pageMetadata);
+    sendPopUpUpdateRequest(pageMetadata);
 
+    // If we used cached metadata, get the latest and update the cache.
     if (wasPageMetadataCached) {
-        // Get the latest from the page and re-cache it.
         await delay(5000);
         pageMetadata = getCurrentPageMetadata();
         cachePageMetadata(location, pageMetadata);
-        sendUpdateRequest(pageMetadata);
+        sendPopUpUpdateRequest(pageMetadata);
     }
 })();

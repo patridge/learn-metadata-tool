@@ -1,10 +1,12 @@
 {
   "name": "Microsoft Learn maintenance tool",
   "short_name": "LearnTool",
-  "description": "Helping you maintain content on Microsoft Learn and Microsoft Docs. Extract metadata from content pages for editing or triage purposes.",
-  "version": "0.4.0",
+  "description": "Helping you maintain content on Microsoft Learn and Docs. Extract metadata from content pages for editing or triage purposes.",
+  "version": "0.5.0",
   "permissions": [
+    // TODO: Research a match pattern instead of `activeTab` (per note in developer dashboard permission justifcation section): https://developer.chrome.com/extensions/match_patterns
     "activeTab",
+    "tabs",
     "declarativeContent",
     "storage"
   ],
@@ -14,8 +16,10 @@
     ],
     "persistent": false
   },
-  "page_action": {
-    "default_popup": "extension-popup.html",
+  // Switched from `page_action` to `browser_action` to get `chrome.browserAction.setPopup` to be defined in code. Previously had everything working fine in `page_action`, but now I have no idea why.
+  // It feels like I should be able to do page_actions for each domain or something, but haven't figured that out (per docs: https://developer.chrome.com/extensions/browserAction#tips).
+  "browser_action": {
+    "default_popup": "learn-extension-popup.html",
     "default_icon": {
       "16": "images/learn-tool16.png",
       "32": "images/learn-tool32.png",
