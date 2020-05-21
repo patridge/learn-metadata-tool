@@ -77,8 +77,6 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let tempAnchor = document.createElement("a");
         tempAnchor.href = tabs[0].url;
         let tabId = tabs[0].id;
-        // TODO: Remove logging after figuring out the structure of tabs and each tab item.
-        console.log({ tab0: tabs[0], tabs: tabs, hostname: tempAnchor.hostname });
         if (tempAnchor.hostname.endsWith("visualstudio.com")) {
             chrome.tabs.executeScript(
                 tabId,
