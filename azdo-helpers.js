@@ -65,8 +65,8 @@
     //     Work item page: https://{organization}.visualstudio.com/{project}/_workitems/edit/{work-item-number}
     //     List page: {organization}.visualstudio.com/{project}/_queries/query/{query-guid}/
     let getWorkItemData = function () {
-        let workItemId = document.querySelectorAll("span[aria-label='ID Field']")[0].textContent;
-        let workItemUrl = document.querySelectorAll(".work-item-form a.caption")[0].href;
+        let workItemId = document.querySelectorAll("span[aria-label='ID Field']")[0]?.textContent;
+        let workItemUrl = document.querySelectorAll(".work-item-form a.caption")[0]?.href;
 
         // let workItemForm = document.getElementsByClassName("work-item-form")[0];
         // let workItemControls = workItemForm?.getElementsByClassName("control");
