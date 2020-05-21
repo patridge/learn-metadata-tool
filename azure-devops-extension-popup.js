@@ -30,7 +30,7 @@ let displayWorkItemData = async function (workItemData) {
         relatedVerbatimsWorkItemsQueryUrl.setAttribute("href", uidMatchVerbatimQuery);
     }
     else {
-        uidSpan.textContent = "<not found>";
+        uidSpan.textContent = "<no work item found>";
         relatedFeedbackWorkItemsQueryUrl.removeAttribute("href");
         relatedVerbatimsWorkItemsQueryUrl.removeAttribute("href");
     }
