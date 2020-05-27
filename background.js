@@ -13,7 +13,7 @@ let setPopUpByTabId = function (tabId) {
                 popup: "learn-extension-popup.html"
             });
         }
-        else if (host.endsWith("visualstudio.com")) {
+        else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
             chrome.browserAction.setPopup({
                 tabId: tabId,
                 popup: "azure-devops-extension-popup.html"
