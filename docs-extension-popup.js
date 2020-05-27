@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
-        const microsoftLearnPageScript = "get-author.js";
+        const microsoftLearnPageScript = "get-docs-metadata.js";
         let tempAnchor = document.createElement("a");
         tempAnchor.href = tabs[0].url;
         let tabId = tabs[0].id;
