@@ -65,6 +65,8 @@
     // storageLocalRemoveAsync([ location ]);
     let getCurrentPageMetadata = function () {
         let metaTags = document.getElementsByTagName("meta");
+        let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
+        let uid = uidTag ? uidTag.getAttribute("content") : "";
         let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
         let msAuthor = msAuthorTag ? msAuthorTag.getAttribute("content") : "";
         let authorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0];
@@ -103,6 +105,7 @@
         })(metaTags);
 
         return {
+            uid,
             msAuthorMetaTagValue: msAuthor,
             gitHubAuthorMetaTagValue: author,
             msDateMetaTagValue: msDate,
