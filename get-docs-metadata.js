@@ -32,12 +32,13 @@
                 let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
                 // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
                 // Use the raw URL for Markdown edit location. (YAML edit location doesn't exist.)
-
+                
                 let gitMarkdownEditUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
+                let gitMarkdownMasterEditUrl = gitMarkdownEditUrl.replace("/live/", "/master/");
                 let gitYamlEditUrl = null; // ?not applicable outside Learn?
                 return {
                     gitYamlEditUrl,
-                    gitMarkdownEditUrl
+                    gitMarkdownEditUrl: gitMarkdownMasterEditUrl
                 };
             }
         })(metaTags);
