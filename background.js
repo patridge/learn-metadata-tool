@@ -78,13 +78,11 @@ chrome.runtime.onInstalled.addListener(function() {
 
 // NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-    console.log("chrome.tabs.onActivated");
     setPopUpByTabId(activeInfo.tabId);
 });
 // NOTE: This handles when you navigate between pages _within_ a tab to readdress which pop-up is shown. (Sometimes, if a page didn't need a pop-up and you navigated to one that should have a pop-up, it wasn't being shown.)
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // This gets called a lot! Restrict to only onUpdated calls where the URL in the tab was changed.
-    console.log("chrome.tabs.onUpdated");
     if (changeInfo.url) {
         setPopUpByTabId(tabId);
     }
