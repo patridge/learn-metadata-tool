@@ -61,11 +61,19 @@ chrome.runtime.onInstalled.addListener(function() {
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
                             hostSuffix: "visualstudio.com",
                         },
+                        pageUrl: {
+                            // We are hoping to allow this extension whenever we can. That includes the following URL examples.
+                            // * Azure DevOps (alt location): https://dev.azure.com/
+                            // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
+                            // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
+                            hostSuffix: "dev.azure.com",
+                        },
                     })
                 ],
                 actions: [
                     new chrome.declarativeContent.ShowPageAction()
                 ]
+                // To call other code during actions, wrap up things in an immediately executed function and return the `ShowPageAction` result.
                 // actions: [(() => {
                 //     // NOTE: These calls may fire immediately after the extension is loaded, not when deciding when to show something on a given tab. (Maybe they only fire when an applicable tab is already open???)
                 //     setPopUpViaActiveTabQuery();

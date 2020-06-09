@@ -77,7 +77,8 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let tempAnchor = document.createElement("a");
         tempAnchor.href = tabs[0].url;
         let tabId = tabs[0].id;
-        if (tempAnchor.hostname.endsWith("visualstudio.com")) {
+        let host = tempAnchor.hostname;
+        if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
             chrome.tabs.executeScript(
                 tabId,
                 {
