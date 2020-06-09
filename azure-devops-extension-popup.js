@@ -24,10 +24,11 @@ let displayWorkItemData = async function (workItemData) {
          */
         const uid = workItemData.UID;
         uidSpan.textContent = uid;
+        uidSpan.title = uid;
 
         // For related items, search for immediate UID and next level up
         // e.g., learn.area.module.1-unit -> [ learn.area.module.1-unit, learn.area.module ]
-        let uidPeriodCount = uid.length - uid.replace(".", "").length;
+        //let uidPeriodCount = uid.length - uid.replace(".", "").length;
         let uidWithoutLastSection = uid.slice(0, uid.lastIndexOf("."));
         let uidSubstrings = [uid, uidWithoutLastSection];
         let uidQuery = `'${uidSubstrings.join("','")}'`;
