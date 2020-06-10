@@ -13,7 +13,7 @@ let setPopUpByTabId = function (tabId) {
                 popup: "learn-extension-popup.html"
             });
         }
-        else if (host.endsWith("visualstudio.com")) {
+        else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
             chrome.browserAction.setPopup({
                 tabId: tabId,
                 popup: "azure-devops-extension-popup.html"
@@ -61,11 +61,19 @@ chrome.runtime.onInstalled.addListener(function() {
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
                             hostSuffix: "visualstudio.com",
                         },
+                        pageUrl: {
+                            // We are hoping to allow this extension whenever we can. That includes the following URL examples.
+                            // * Azure DevOps (alt location): https://dev.azure.com/
+                            // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
+                            // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
+                            hostSuffix: "dev.azure.com",
+                        },
                     })
                 ],
                 actions: [
                     new chrome.declarativeContent.ShowPageAction()
                 ]
+                // To call other code during actions, wrap up things in an immediately executed function and return the `ShowPageAction` result.
                 // actions: [(() => {
                 //     // NOTE: These calls may fire immediately after the extension is loaded, not when deciding when to show something on a given tab. (Maybe they only fire when an applicable tab is already open???)
                 //     setPopUpViaActiveTabQuery();
@@ -73,18 +81,18 @@ chrome.runtime.onInstalled.addListener(function() {
                 // })()]
             }
         ]);
-
-        // NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
-        chrome.tabs.onActivated.addListener(function (activeInfo) {
-            setPopUpByTabId(activeInfo.tabId);
-        });
-        // NOTE: This handles when you navigate between pages _within_ a tab to readdress which pop-up is shown. (Sometimes, if a page didn't need a pop-up and you navigated to one that should have a pop-up, it wasn't being shown.)
-        chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-            // This gets called a lot! Restrict to only onUpdated calls where the URL in the tab was changed.
-            if (changeInfo.url) {
-                setPopUpByTabId(tabId);
-            }
-        });
-        // TODO: Add a default pop-up that isn't set for a page, in case we haven't run anything yet.
     });
 });
+
+// NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    setPopUpByTabId(activeInfo.tabId);
+});
+// NOTE: This handles when you navigate between pages _within_ a tab to readdress which pop-up is shown. (Sometimes, if a page didn't need a pop-up and you navigated to one that should have a pop-up, it wasn't being shown.)
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    // This gets called a lot! Restrict to only onUpdated calls where the URL in the tab was changed.
+    if (changeInfo.url) {
+        setPopUpByTabId(tabId);
+    }
+});
+// TODO: Add a default pop-up that isn't set for a page, in case we haven't run anything yet.

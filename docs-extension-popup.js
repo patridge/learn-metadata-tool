@@ -1,4 +1,5 @@
 // NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
+let uidSpan = document.querySelector("#uid");
 let msAuthorSpan = document.getElementById("msAuthor");
 let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
@@ -18,6 +19,7 @@ copyButtons.forEach(btn => {
 });
 
 let displayMetadata = async function (metadata) {
+    uidSpan.textContent = metadata.uid;
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     gitHubAuthorSpan.textContent = metadata.gitHubAuthorMetaTagValue;
     msDateSpan.textContent = metadata.msDateMetaTagValue;
@@ -54,7 +56,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
-        const microsoftLearnPageScript = "get-author.js";
+        const microsoftLearnPageScript = "get-docs-metadata.js";
         let tempAnchor = document.createElement("a");
         tempAnchor.href = tabs[0].url;
         let tabId = tabs[0].id;

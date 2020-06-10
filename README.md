@@ -1,4 +1,4 @@
-# Learn metadata maintenance tool
+# Learn Maintenance Tool
 
 Determine the author of a given Microsoft Learn or Microsoft Docs page. And quickly navigate to the content in GitHub to propose edits. This tool was created for the Microsoft Learn content team to help triage user-reported feedback to the right maintainer, but anyone is welcome to use it if it helps them.
 
@@ -6,14 +6,21 @@ Determine the author of a given Microsoft Learn or Microsoft Docs page. And quic
 
 ## Features
 
-Extract the critical page metadata fields into a Chrome extension pop-up display, with clickable links to the YAML and Markdown pages for editing directly in GitHub.
+### View Microsoft Learn and Microsoft Docs page metadata
+
+When you are viewing a Microsoft Learn or Microsoft Docs content page, clicking the Learn Maintenance Tool extension will show a pop-up with useful page metadata fields, each with a copy button to allow for easy pasting where you need it. The pop-up also includes clickable links to open the YAML and Markdown pages for editing directly in GitHub.
 
 This is the information currently being extracted:
 
 * `ms.author`
 * `author`
 * `ms.date`
+* `uid`
 * Edit URL(s), either `original_content_git_url` or a modified version of `original_ref_skeleton_git_url` for YAML and/or Markdown pages
+
+### View Microsoft Learn content page from Azure DevOps customer feedback work items
+
+When you are viewing a customer feedback work item for a Microsoft Learn page the Learn Maintenance Tool extension will show a pop-up with some userful metadata fields and a link to view other open feedback for this unit and parent module as well as any customer feedback rating verbatims. This way, you can tackle several work items in a single maintenance session.
 
 ## Installation
 
@@ -46,15 +53,24 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 1. Confirm the extension install by clicking the **Add extension** button from the resulting pop-up.
     ![Screenshot of pop-up prompt confirming Chrome extension install](media/edge-confirm-extension-install.png)
 
+## Release notes
+
+### v0.6.0:
+
+* Allow use on Azure DevOps from alternate domain: dev.azure.com/{team}/{project}
+* Offer UID when gathering metadata for Learn content pages
+* Fix issues with correct pop-up not loading in some situations
+* Truncate long metadata values while offering full text in a hover value
+* Fix GitHub URL for Docs pages with the correct branch
+
 ## Roadmap
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.5+: Customization
+### v0.7+: Customization
 
 * Allow customizing which metadata fields are important to you
 
-### v???: The Future
+### Future plans and suggestions
 
-* Offer interactions with Azure DevOps work items directly
-* Offer area path interpretation or intelligent guess for work item categorization
+You can follow along with planned development efforts by [looking at the open GitHub issues with the **enhancement** tag](https://github.com/patridge/learn-metadata-tool/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement). If you have a feature or suggestion you want to propose, [submit your own enhancement request on GitHub](https://github.com/patridge/learn-metadata-tool/issues/new?labels=enhancement).

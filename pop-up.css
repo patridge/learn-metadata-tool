@@ -1,0 +1,18 @@
+body {
+    font-size: 75%;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    margin: 0.25em;
+}
+table {
+    width: 250px;
+}
+tr {
+    padding: 0.25em;
+}
+.copy-field-target {
+    display: inline-block;
+    width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
