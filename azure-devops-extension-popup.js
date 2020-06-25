@@ -17,12 +17,12 @@ copyButtons.forEach(btn => {
 });
 
 let displayWorkItemData = async function (workItemData) {
-    // TODO: Figure out why it doesn't display properly for module work items (e.g., https://ceapex.visualstudio.com/Microsoft%20Learn/_workitems/edit/51164).
-    if (workItemData.UID) {
-        /**
-         * @type {string}
-         */
-        const uid = workItemData.UID;
+    // NOTE: Semi-brittle here, since AzDO fields can have custom labels. Fields show the raw field name in a hover on the label, but I can't seem to find where that data is hiding in the rendered HTML yet. For module work items, the UID field is aliased as "Module UID", so we have to look there as a fallback.
+    /**
+     * @type {string}
+     */
+    let uid = workItemData.UID || workItemData["Module UID"];
+    if (uid) {
         uidSpan.textContent = uid;
         uidSpan.title = uid;
 
@@ -48,6 +48,7 @@ let displayWorkItemData = async function (workItemData) {
         relatedVerbatimsWorkItemsQueryUrl.removeAttribute("href");
     }
 
+    // NOTE: Module work items won't have a URL field, so we don't get a link for those work items.
     if (workItemData.URL) {
         contentUrl.setAttribute("href", workItemData.URL);
     }
