@@ -18,7 +18,7 @@ copyButtons.forEach(btn => {
     };
 });
 
-let displayMetadata = async function (metadata) {
+let displayMetadata = function (metadata) {
     uidSpan.textContent = metadata.uid;
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     gitHubAuthorSpan.textContent = metadata.gitHubAuthorMetaTagValue;
@@ -41,7 +41,7 @@ let displayMetadata = async function (metadata) {
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
     switch (request.method) {
         case "metadataCollected":
-            await displayMetadata(request.data);
+            displayMetadata(request.data);
 
             sendResponse(
                 {

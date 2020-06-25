@@ -3,7 +3,12 @@ let uidSpan = document.getElementById("uid");
 let contentUrl = document.getElementById("contentUrl");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
+let msAuthorSpan = document.getElementById("msAuthor");
+let msDateSpan = document.getElementById("msDate");
+let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
+let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
 
+// TODO: Refactor: duplicated in learn-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
     btn.onclick = async function(element) {
@@ -17,12 +22,12 @@ copyButtons.forEach(btn => {
 });
 
 let displayWorkItemData = async function (workItemData) {
-    // TODO: Figure out why it doesn't display properly for module work items (e.g., https://ceapex.visualstudio.com/Microsoft%20Learn/_workitems/edit/51164).
-    if (workItemData.UID) {
-        /**
-         * @type {string}
-         */
-        const uid = workItemData.UID;
+    // NOTE: Semi-brittle here, since AzDO fields can have custom labels. Fields show the raw field name in a hover on the label, but I can't seem to find where that data is hiding in the rendered HTML yet. For module work items, the UID field is aliased as "Module UID", so we have to look there as a fallback.
+    /**
+     * @type {string}
+     */
+    let uid = workItemData.UID || workItemData["Module UID"];
+    if (uid) {
         uidSpan.textContent = uid;
         uidSpan.title = uid;
 
@@ -48,6 +53,7 @@ let displayWorkItemData = async function (workItemData) {
         relatedVerbatimsWorkItemsQueryUrl.removeAttribute("href");
     }
 
+    // NOTE: Module work items won't have a URL field, so we don't get a link for those work items.
     if (workItemData.URL) {
         contentUrl.setAttribute("href", workItemData.URL);
     }
@@ -55,17 +61,127 @@ let displayWorkItemData = async function (workItemData) {
         contentUrl.removeAttribute('href');
     }
 };
+let displayContentPageMetadata = function (metadata) {
+    msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
+    msDateSpan.textContent = metadata.msDateMetaTagValue;
 
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+    if (metadata.gitHubYamlLocation) {
+        contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
+    }
+    else {
+        contentYamlGitUrlAnchor.removeAttribute('href');
+    }
+    if (metadata.gitHubMarkdownLocation) {
+        contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
+    }
+    else {
+        contentMarkdownGitUrlAnchor.removeAttribute('href');
+    }
+};
+
+// TODO: Refactor, extremely similar to method from get-docs-metadata.js (except with different root from `document`).
+let getCurrentPageMetadata = function (rootElement) {
+    let metaTags = rootElement.getElementsByTagName("meta");
+    let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
+    let uid = uidTag ? uidTag.getAttribute("content") : "";
+    let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
+    let msAuthor = msAuthorTag ? msAuthorTag.getAttribute("content") : "";
+    let authorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0];
+    let author = authorTag ? authorTag.getAttribute("content") : "";
+    let msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
+    let msDate = msDateTag ? msDateTag.getAttribute("content") : "";
+    let gitUrlValues = (function (metaTags) {
+        // Learn uses `original_ref_skeleton_git_url` while Docs pages use `original_content_git_url`.
+        let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_ref_skeleton_git_url")[0];
+        // e.g., <meta name="original_ref_skeleton_git_url" content="https://github.com/MicrosoftDocs/learn-pr/blob/live/learn-pr/azure/welcome-to-azure/2-what-is-azure.yml" />
+        // Edit location is for a .yml (YAML) file on the live branch. We switch to master branch manually (where edits are made), and swap for .md for Markdown content.
+
+        if (gitUrlTag !== undefined) {
+            let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
+            let gitYamlMasterUrl = gitUrl.replace("/live/", "/master/");
+            let gitMarkdownMasterUrl = gitYamlMasterUrl.endsWith("/index.yml")
+                ? gitYamlMasterUrl
+                : [ ...gitYamlMasterUrl.split("/").slice(0, -1), "includes", gitYamlMasterUrl.split("/").slice(-1)[0].replace("yml", "md") ].join("/");
+            return {
+                gitYamlEditUrl: gitYamlMasterUrl,
+                gitMarkdownEditUrl: gitMarkdownMasterUrl
+            };
+        }
+        else {
+            let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
+            // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
+            // Use the raw URL for Markdown edit location. (YAML edit location doesn't exist.)
+            
+            let gitMarkdownEditUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
+            let gitMarkdownMasterEditUrl = gitMarkdownEditUrl.replace("/live/", "/master/");
+            let gitYamlEditUrl = null; // ?not applicable outside Learn?
+            return {
+                gitYamlEditUrl,
+                gitMarkdownEditUrl: gitMarkdownMasterEditUrl
+            };
+        }
+    })(metaTags);
+
+    return {
+        uid,
+        msAuthorMetaTagValue: msAuthor,
+        gitHubAuthorMetaTagValue: author,
+        msDateMetaTagValue: msDate,
+        gitHubYamlLocation: gitUrlValues.gitYamlEditUrl,
+        gitHubMarkdownLocation: gitUrlValues.gitMarkdownEditUrl,
+    };
+};
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log(`Message received (azure-devops-extension-popup.js): ${request.method}`, request);
     switch (request.method) {
         case "workItemCollected":
-            await displayWorkItemData(request.data);
+            displayWorkItemData(request.data);
 
             sendResponse(
                 {
                     result: "success"
                 }
             );
+            break;
+        case "requestLearnContentPage":
+            let contentUrl = request?.data?.url;
+            if (!contentUrl) {
+                sendResponse(
+                    {
+                        result: "error",
+                        message: "Content URL not provided.",
+                    }
+                );
+                break;
+            }
+
+            fetch(contentUrl).then(async response => {
+                if (!response.ok) {
+                    console.warn(`Content author response not ok: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                console.log(`Content page response: ${response.status}`, response);
+
+                // TODO: Restrict to reading HTML stream only up through </head> close tag.
+                let fullBody = await response.text();
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(fullBody, "text/html");
+                let metaTags = getCurrentPageMetadata(doc);
+
+                displayContentPageMetadata(metaTags);
+
+                // Sending response asyncronously.
+                sendResponse(
+                    {
+                        result: "success"
+                    }
+                );
+            });
+
+            // Return true to tell Chrome we are returning this response asyncronously.
+            return true;
             break;
     }
 });

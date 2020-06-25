@@ -84,6 +84,22 @@ chrome.runtime.onInstalled.addListener(function() {
     });
 });
 
+// TODO: Figure out why background.js doesn't seem to receive any messages like this. (Or I don't see the console output in the page console or pop-up console.)
+// Listen for a request to have the background script request another page (avoids CORB errors with cross-site requests).
+// chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+//     console.log(`Message received (background.js): ${request.method}`, request);
+//     switch (request.method) {
+//         case "requestLearnContentPage":
+//             sendResponse(
+//                 {
+//                     result: "test",
+//                     data: {},
+//                 }
+//             );
+//             break;
+//     }
+// });
+
 // NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     setPopUpByTabId(activeInfo.tabId);
