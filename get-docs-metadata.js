@@ -1,8 +1,8 @@
 // NOTE: Had to stuff everything in this immediately executing function to avoid duplicate declaration errors when this script was run every time the pop-up was loaded. Probably a better way to handle this, though.
 (async function () {
     // storageLocalRemoveAsync([ location ]);
-    let getCurrentPageMetadata = function () {
-        let metaTags = document.getElementsByTagName("meta");
+    let getCurrentPageMetadata = function (rootElement) {
+        let metaTags = rootElement.getElementsByTagName("meta");
         let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
         let uid = uidTag ? uidTag.getAttribute("content") : "";
         let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
@@ -69,6 +69,6 @@
         );
     };
 
-    var pageMetadata = getCurrentPageMetadata();
+    var pageMetadata = getCurrentPageMetadata(document);
     sendPopUpUpdateRequest(pageMetadata);
 })();
