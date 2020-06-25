@@ -1,8 +1,8 @@
 {
   "name": "Microsoft Learn maintenance tool",
   "short_name": "LearnTool",
-  "description": "Helping you maintain content on Microsoft Learn and Docs. Extract metadata from content pages for editing or triage purposes.",
-  "version": "0.6.0",
+  "description": "Helping you maintain content on Microsoft Learn and Docs. Extract useful metadata quickly for editing or triage purposes.",
+  "version": "0.7.0",
   "permissions": [
     "activeTab",
     "tabs",
