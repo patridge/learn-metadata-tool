@@ -8,10 +8,7 @@
     "tabs",
     "declarativeContent",
     "storage",
-    // "webRequest",
-    "*://*.docs.microsoft.com/*",
-    "*://*.visualstudio.com/*",
-    "*://dev.azure.com/*"
+    "*://*.docs.microsoft.com/*"
   ],
   "background": {
     "scripts": [
