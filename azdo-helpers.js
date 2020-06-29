@@ -34,11 +34,15 @@
             }
         );
     };
+    let isVisible = function (elem) {
+        return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+    };
     let getWorkItemData = function () {
-        let workItemId = document.querySelectorAll("span[aria-label='ID Field']")[0]?.textContent;
-        let workItemUrl = document.querySelectorAll(".work-item-form a.caption")[0]?.href;
+        // NOTE: We were seeing multiple elements under certain circumstances on Azure DevOps with only one visible. All these queries are now filtering based on `isVisible` (borrowed from jQuery, via [Stack Overflow](https://stackoverflow.com/a/33456469/48700)).
+        let workItemId = [...document.querySelectorAll("span[aria-label='ID Field']")].filter(el => isVisible(el))[0]?.textContent;
+        let workItemUrl = [...document.querySelectorAll(".work-item-form a.caption")].filter(el => isVisible(el))[0]?.href;
 
-        let workItemControls = document.querySelectorAll(".work-item-form .control");
+        let workItemControls = [...document.querySelectorAll(".work-item-form .control")].filter(el => isVisible(el));
         let fieldsAndValues = [...workItemControls].map((control) => {
             let labelControl = control.getElementsByClassName("workitemcontrol-label")[0];
             let inputControl = control.getElementsByTagName("input")[0];
