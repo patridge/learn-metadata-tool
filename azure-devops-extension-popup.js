@@ -38,7 +38,7 @@ let displayWorkItemData = async function (workItemData) {
         let uidSubstrings = [uid, uidWithoutLastSection];
         let uidQuery = `'${uidSubstrings.join("','")}'`;
         let issueQuery = `SELECT [System.Id],[Title],[Severity],[Created Date],[Work Item Type],[Assigned To],[Triage Status],[Feedback Type],[UID],[URL],[Repo MSFT Learn] FROM workitems WHERE [Team Project] = @project AND [Work Item Type] = 'Customer Feedback' AND [State] = 'New'
-        AND [UID] IN (${uidQuery}) AND [Feedback Source]='Report an issue' ORDER BY [UID], [Severity]`;
+        AND [UID] IN (${uidQuery}) AND [Feedback Source]<>'Star rating verbatim' ORDER BY [UID], [Severity]`;
         let uidMatchIssuesQuery = `https://ceapex.visualstudio.com/Microsoft%20Learn/_queries/query/?wiql=${encodeURIComponent(issueQuery)}`;
         relatedFeedbackWorkItemsQueryUrl.setAttribute("href", uidMatchIssuesQuery);
         let verbatimQuery = `SELECT [System.Id],[Title],[Severity],[Created Date],[Work Item Type],[Assigned To],[Triage Status],[Feedback Type],[UID],[URL],[Repo MSFT Learn] FROM workitems WHERE [Team Project] = @project AND [Work Item Type] = 'Customer Feedback' AND [State] = 'New'
