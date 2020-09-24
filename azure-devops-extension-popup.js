@@ -1,4 +1,6 @@
 // NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
+const defaultTriageAnchorLabel = "Triage query (Azure DevOps)";
+const defaultTriageAnchorUrl = "https://aka.ms/learn-azure-triage";
 let uidSpan = document.getElementById("uid");
 let contentUrl = document.getElementById("contentUrl");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
@@ -7,11 +9,12 @@ let msAuthorSpan = document.getElementById("msAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let triageAnchor = document.getElementById("triageAnchor");
 
 // TODO: Refactor: duplicated in learn-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
-copyButtons.forEach(btn => {
-    btn.onclick = async function(element) {
+copyButtons.forEach(function (btn) {
+    btn.onclick = async function (element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
         let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
@@ -20,6 +23,25 @@ copyButtons.forEach(btn => {
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
     };
 });
+
+let getTriageAnchor = async function () {
+    let currentSavedTriageAnchor = await storageHelper.storageSyncGetAsync(
+        {
+            triageAnchorLabel: null,
+            triageAnchorUrl: null
+        }
+    );
+    console.log(currentSavedTriageAnchor);
+    return currentSavedTriageAnchor;
+};
+let setTriageAnchorToDefault = async function () { await setTriageAnchor(defaultTriageAnchorLabel, defaultTriageAnchorUrl); };
+let setTriageAnchor = async function (customTriageAnchorLabel, customTriageAnchorUrl) {
+    console.log(`Setting triage anchor: [${customTriageAnchorLabel}](${customTriageAnchorUrl})`);
+    await storageHelper.storageSyncSetAsync({
+        triageAnchorLabel: customTriageAnchorLabel,
+        triageAnchorUrl: customTriageAnchorUrl
+    });
+};
 
 let displayWorkItemData = async function (workItemData) {
     // NOTE: Semi-brittle here, since AzDO fields can have custom labels. Fields show the raw field name in a hover on the label, but I can't seem to find where that data is hiding in the rendered HTML yet. For module work items, the UID field is aliased as "Module UID", so we have to look there as a fallback.
@@ -58,7 +80,7 @@ let displayWorkItemData = async function (workItemData) {
         contentUrl.setAttribute("href", workItemData.URL);
     }
     else {
-        contentUrl.removeAttribute('href');
+        contentUrl.removeAttribute("href");
     }
 };
 let displayContentPageMetadata = function (metadata) {
@@ -69,13 +91,13 @@ let displayContentPageMetadata = function (metadata) {
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
-        contentYamlGitUrlAnchor.removeAttribute('href');
+        contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
-        contentMarkdownGitUrlAnchor.removeAttribute('href');
+        contentMarkdownGitUrlAnchor.removeAttribute("href");
     }
 };
 
@@ -205,3 +227,17 @@ chrome.tabs.query({ active: true, currentWindow: true },
         }
     }
 );
+
+let displayTriageAnchor = async () => {
+    // If user has saved a custom triage URL, overwrite the default.
+    let customTriageAnchorDetails = await getTriageAnchor();
+    if (customTriageAnchorDetails) {
+        if (customTriageAnchorDetails.triageAnchorUrl) {
+            triageAnchor.setAttribute("href", customTriageAnchorDetails.triageAnchorUrl);
+        }
+        if (customTriageAnchorDetails.triageAnchorLabel) {
+            triageAnchor.text = customTriageAnchorDetails.triageAnchorLabel;
+        }
+    }
+};
+displayTriageAnchor();
