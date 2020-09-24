@@ -55,7 +55,15 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 ## Release notes
 
-### v0.6.0:
+### v0.7
+
+* [v0.7.0] While on an Azure DevOps customer feedback work item, extract metadata from the target content page when the extension is activated
+* [v0.7.0] Extract UID from module work items
+* [v0.7.1] Azure DevOps: Handle when multiple work item structures exist in page HTML (#40)
+* [v0.7.1] Related work item query now only excludes star rating verbatims (#42)
+* [v0.7.2] Fix for missing Markdown edit link after Learn switched metadata fields (#45)
+
+### v0.6
 
 * Allow use on Azure DevOps from alternate domain: dev.azure.com/{team}/{project}
 * Offer UID when gathering metadata for Learn content pages
@@ -67,8 +75,9 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 Here are the current plans for upcoming releases. These are definitely subject to change as this project develops or evolves.
 
-### v0.7+: Customization
+### v0.8+: Customization
 
+* Offer a customizable URL to take you to an Azure DevOps query of your choice
 * Allow customizing which metadata fields are important to you
 
 ### Future plans and suggestions
