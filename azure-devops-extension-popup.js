@@ -91,35 +91,33 @@ let getCurrentPageMetadata = function (rootElement) {
     let msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
     let msDate = msDateTag ? msDateTag.getAttribute("content") : "";
     let gitUrlValues = (function (metaTags) {
-        // Learn uses `original_ref_skeleton_git_url` while Docs pages use `original_content_git_url`.
-        let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_ref_skeleton_git_url")[0];
-        // e.g., <meta name="original_ref_skeleton_git_url" content="https://github.com/MicrosoftDocs/learn-pr/blob/live/learn-pr/azure/welcome-to-azure/2-what-is-azure.yml" />
-        // Edit location is for a .yml (YAML) file on the live branch. We switch to master branch manually (where edits are made), and swap for .md for Markdown content.
-
-        if (gitUrlTag !== undefined) {
-            let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
-            let gitYamlMasterUrl = gitUrl.replace("/live/", "/master/");
-            let gitMarkdownMasterUrl = gitYamlMasterUrl.endsWith("/index.yml")
-                ? gitYamlMasterUrl
-                : [ ...gitYamlMasterUrl.split("/").slice(0, -1), "includes", gitYamlMasterUrl.split("/").slice(-1)[0].replace("yml", "md") ].join("/");
-            return {
-                gitYamlEditUrl: gitYamlMasterUrl,
-                gitMarkdownEditUrl: gitMarkdownMasterUrl
-            };
+        // Learn stopped using `original_ref_skeleton_git_url`, likely to align with greater-Docs, so everywhere seems to be using `original_content_git_url` now.
+        let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
+        // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
+        let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
+        // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
+        let gitEditUrl = gitUrl.replace("/live/", "/master/");
+        let gitYamlEditUrl = null;
+        let gitMarkdownEditUrl = null;
+        if (gitEditUrl.endsWith("/index.yml")) {
+            // Learn has index pages that are generated entirely from a YAML page.
+            gitYamlEditUrl = gitEditUrl;
+            gitMarkdownEditUrl = null;
+        }
+        else if (gitEditUrl.endsWith(".yml")) {
+            // Learn has other pages with both YAML and MD content contributing to the final HTML output.
+            gitYamlEditUrl = gitEditUrl;
+            gitMarkdownEditUrl = [ ...gitEditUrl.split("/").slice(0, -1), "includes", gitEditUrl.split("/").slice(-1)[0].replace("yml", "md") ].join("/");
         }
         else {
-            let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
-            // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
-            // Use the raw URL for Markdown edit location. (YAML edit location doesn't exist.)
-            
-            let gitMarkdownEditUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
-            let gitMarkdownMasterEditUrl = gitMarkdownEditUrl.replace("/live/", "/master/");
-            let gitYamlEditUrl = null; // ?not applicable outside Learn?
-            return {
-                gitYamlEditUrl,
-                gitMarkdownEditUrl: gitMarkdownMasterEditUrl
-            };
+            // Most of Docs has content and metadata entirely in a Markdown file.
+            gitYamlEditUrl = null;
+            gitMarkdownEditUrl = gitEditUrl;
         }
+        return {
+            gitYamlEditUrl,
+            gitMarkdownEditUrl
+        };
     })(metaTags);
 
     return {
