@@ -5,6 +5,8 @@ let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
+let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
@@ -19,7 +21,8 @@ copyButtons.forEach(btn => {
 });
 
 let displayMetadata = function (metadata) {
-    uidSpan.textContent = metadata.uid;
+    let uid = metadata.uid;
+    uidSpan.textContent = uid;
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     gitHubAuthorSpan.textContent = metadata.gitHubAuthorMetaTagValue;
     msDateSpan.textContent = metadata.msDateMetaTagValue;
@@ -36,6 +39,22 @@ let displayMetadata = function (metadata) {
     else {
         contentMarkdownGitUrlAnchor.removeAttribute('href');
     }
+
+    // For related items, search for immediate UID and next level up
+    // e.g., learn.area.module.1-unit -> [ learn.area.module.1-unit, learn.area.module ]
+    //let uidPeriodCount = uid.length - uid.replace(".", "").length;
+    let uidWithoutLastSection = uid.slice(0, uid.lastIndexOf("."));
+    let uidSubstrings = [uid, uidWithoutLastSection];
+    let uidQuery = `'${uidSubstrings.join("','")}'`;
+    let issueQuery = `SELECT [System.Id],[Title],[Severity],[Created Date],[Work Item Type],[Assigned To],[Triage Status],[Feedback Type],[UID],[URL],[Repo MSFT Learn] FROM workitems WHERE [Team Project] = @project AND [Work Item Type] = 'Customer Feedback' AND [State] = 'New'
+    AND [UID] IN (${uidQuery}) AND [Feedback Source]='Report an issue' ORDER BY [UID], [Severity]`;
+    let uidMatchIssuesQuery = `https://ceapex.visualstudio.com/Microsoft%20Learn/_queries/query/?wiql=${encodeURIComponent(issueQuery)}`;
+    relatedFeedbackWorkItemsQueryUrl.setAttribute("href", uidMatchIssuesQuery);
+    let verbatimQuery = `SELECT [System.Id],[Title],[Severity],[Created Date],[Work Item Type],[Assigned To],[Triage Status],[Feedback Type],[UID],[URL],[Repo MSFT Learn] FROM workitems WHERE [Team Project] = @project AND [Work Item Type] = 'Customer Feedback' AND [State] = 'New'
+    AND [UID] IN (${uidQuery}) AND [Feedback Source]='Star rating verbatim' ORDER BY [UID], [Severity]`;
+    let uidMatchVerbatimQuery = `https://ceapex.visualstudio.com/Microsoft%20Learn/_queries/query/?wiql=${encodeURIComponent(verbatimQuery)}`;
+    relatedFeedbackWorkItemsQueryUrl.setAttribute("href", uidMatchIssuesQuery);
+    relatedVerbatimsWorkItemsQueryUrl.setAttribute("href", uidMatchVerbatimQuery);
 };
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
