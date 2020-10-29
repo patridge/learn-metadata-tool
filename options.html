@@ -3,20 +3,20 @@
 <head><title>Options - Learn Metadata Explorer</title></head>
 <body>
 
-Custom link label:
-<span id="customLinkLabel"></span>
+<div>
+    Set link label:
+    <input type="text" id="newCustomLinkLabel" /> <span id="customLinkLabel"></span>
+</div>
 
-Set custom link label:
-<input type="text" id="newCustomLinkLabel" /><button id="setNewCustomLinkLabel">Set label</button>
+<div>
+    Set link Url:
+    <input type="text" id="newCustomLinkUrl" /> <span id="customLinkUrl"></span>
+</div>
 
-<hr />
-
-Custom link URL:
-<span id="customLinkUrl"></span>
-
-Set custom link Url:
-<input type="text" id="newCustomLinkUrl" /><button id="setNewCustomLinkUrl">Set Url</button>
-
+<div>
+    <button id="setNewCustomLinkLabel">Set custom link</button>
+</div>
+    
 <div id="status"></div>
 
 <script src="js/storage-helpers.js"></script>

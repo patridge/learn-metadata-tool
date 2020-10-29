@@ -11,7 +11,7 @@ let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
 let triageAnchor = document.getElementById("triageAnchor");
 
-// TODO: Refactor: duplicated in learn-extension-popup.html.
+// TODO: Refactor: duplicated in docs-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(function (btn) {
     btn.onclick = async function (element) {
@@ -33,14 +33,6 @@ let getTriageAnchor = async function () {
     );
     console.log(currentSavedTriageAnchor);
     return currentSavedTriageAnchor;
-};
-let setTriageAnchorToDefault = async function () { await setTriageAnchor(defaultTriageAnchorLabel, defaultTriageAnchorUrl); };
-let setTriageAnchor = async function (customTriageAnchorLabel, customTriageAnchorUrl) {
-    console.log(`Setting triage anchor: [${customTriageAnchorLabel}](${customTriageAnchorUrl})`);
-    await storageHelper.storageSyncSetAsync({
-        triageAnchorLabel: customTriageAnchorLabel,
-        triageAnchorUrl: customTriageAnchorUrl
-    });
 };
 
 let displayWorkItemData = async function (workItemData) {

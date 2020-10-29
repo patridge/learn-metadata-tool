@@ -70,3 +70,27 @@ chrome.tabs.query({ active: true, currentWindow: true },
         }
     }
 );
+
+let getTriageAnchor = async function () {
+    let currentSavedTriageAnchor = await storageHelper.storageSyncGetAsync(
+        {
+            triageAnchorLabel: null,
+            triageAnchorUrl: null
+        }
+    );
+    console.log(currentSavedTriageAnchor);
+    return currentSavedTriageAnchor;
+};
+let displayTriageAnchor = async () => {
+    // If user has saved a custom triage URL, overwrite the default.
+    let customTriageAnchorDetails = await getTriageAnchor();
+    if (customTriageAnchorDetails) {
+        if (customTriageAnchorDetails.triageAnchorUrl) {
+            triageAnchor.setAttribute("href", customTriageAnchorDetails.triageAnchorUrl);
+        }
+        if (customTriageAnchorDetails.triageAnchorLabel) {
+            triageAnchor.text = customTriageAnchorDetails.triageAnchorLabel;
+        }
+    }
+};
+displayTriageAnchor();
