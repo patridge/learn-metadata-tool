@@ -54,8 +54,10 @@ let displayWorkItemData = async function (workItemData) {
     }
 
     // NOTE: Module work items won't have a URL field, so we don't get a link for those work items.
-    if (workItemData.URL) {
-        contentUrl.setAttribute("href", workItemData.URL);
+    // NOTE: For Technical Review items, the content URL is labeled "Published URL".
+    let learnUrl = workItemData.URL || workItemData["Published URL"];
+    if (learnUrl) {
+        contentUrl.setAttribute("href", learnUrl);
     }
     else {
         contentUrl.removeAttribute('href');
