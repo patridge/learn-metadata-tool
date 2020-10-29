@@ -62,6 +62,8 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 * [v0.7.1] Azure DevOps: Handle when multiple work item structures exist in page HTML (#40)
 * [v0.7.1] Related work item query now only excludes star rating verbatims (#42)
 * [v0.7.2] Fix for missing Markdown edit link after Learn switched metadata fields (#45)
+* [v0.7.3] Get content URL properly from Technical Review work items in Azure DevOps
+* [v0.7.3] Also offer related issues/verbatims from Learn pages (no longer just on Azure DevOps work items)
 
 ### v0.6
 
