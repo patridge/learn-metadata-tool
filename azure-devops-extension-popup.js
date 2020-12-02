@@ -9,7 +9,8 @@ let msAuthorSpan = document.getElementById("msAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
-let triageAnchor = document.getElementById("triageAnchor");
+let customLink = document.getElementById("customLink");
+const customLinkSection = document.getElementById("customLinkSection");
 
 // TODO: Refactor: duplicated in docs-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
@@ -23,17 +24,6 @@ copyButtons.forEach(function (btn) {
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
     };
 });
-
-let getTriageAnchor = async function () {
-    let currentSavedTriageAnchor = await storageHelper.storageSyncGetAsync(
-        {
-            triageAnchorLabel: null,
-            triageAnchorUrl: null
-        }
-    );
-    console.log(currentSavedTriageAnchor);
-    return currentSavedTriageAnchor;
-};
 
 let displayWorkItemData = async function (workItemData) {
     // NOTE: Semi-brittle here, since AzDO fields can have custom labels. Fields show the raw field name in a hover on the label, but I can't seem to find where that data is hiding in the rendered HTML yet. For module work items, the UID field is aliased as "Module UID", so we have to look there as a fallback.
@@ -186,7 +176,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                 displayContentPageMetadata(metaTags);
 
-                // Sending response asyncronously.
+                // Sending response asynchronously.
                 sendResponse(
                     {
                         result: "success"
@@ -194,7 +184,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 );
             });
 
-            // Return true to tell Chrome we are returning this response asyncronously.
+            // Return true to tell Chrome we are returning this response asynchronously.
             return true;
             break;
     }
@@ -220,16 +210,30 @@ chrome.tabs.query({ active: true, currentWindow: true },
     }
 );
 
-let displayTriageAnchor = async () => {
-    // If user has saved a custom triage URL, overwrite the default.
-    let customTriageAnchorDetails = await getTriageAnchor();
-    if (customTriageAnchorDetails) {
-        if (customTriageAnchorDetails.triageAnchorUrl) {
-            triageAnchor.setAttribute("href", customTriageAnchorDetails.triageAnchorUrl);
+let getCustomLink = async function () {
+    let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
+        {
+            customLinkLabel: null,
+            customLinkUrl: null,
+            hasSetCustomLink: false,
+            isLinkDisabled: true
         }
-        if (customTriageAnchorDetails.triageAnchorLabel) {
-            triageAnchor.text = customTriageAnchorDetails.triageAnchorLabel;
+    );
+    console.log(currentSavedCustomLink);
+    return currentSavedCustomLink;
+};
+let displayCustomLink = async () => {
+    customLinkSection.style.display = "none";
+    const customLinkDetails = await getCustomLink();
+    const showCustomLink = !(customLinkDetails?.isLinkDisabled ?? true);
+    if (showCustomLink) {
+        if (customLinkDetails.customLinkUrl) {
+            customLinkSection.style.display = "block";
+            customLink.setAttribute("href", customLinkDetails.customLinkUrl);
+            if (customLinkDetails.customLinkLabel) {
+                customLink.text = customLinkDetails.customLinkLabel;
+            }
         }
     }
 };
-displayTriageAnchor();
+displayCustomLink();

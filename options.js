@@ -1,67 +1,103 @@
-let newCustomLinkLabelInput = document.getElementById("newCustomLinkLabel");
-let setCustomLinkLabelButton = document.getElementById("setNewCustomLinkLabel");
-let newCustomLinkUrlInput = document.getElementById("newCustomLinkUrl");
-let setCustomLinkUrlButton = document.getElementById("setNewCustomLinkUrl");
-let statusLabel = document.getElementById("status");
-const defaultTriageAnchorLabel = "Triage query (Azure DevOps)";
-const defaultTriageAnchorUrl = "https://aka.ms/learn-azure-triage";
+const newCustomLinkLabelInput = document.getElementById("newCustomLinkLabel");
+const setCustomLinkLabelButton = document.getElementById("setNewCustomLinkLabel");
+const newCustomLinkUrlInput = document.getElementById("newCustomLinkUrl");
+const setCustomLinkUrlButton = document.getElementById("setNewCustomLinkUrl");
+const resetCustomLinkButton = document.getElementById("resetCustomLink");
+const statusLabel = document.getElementById("status");
+const disableCustomLinkButton = document.getElementById("disableCustomLink");
+const defaultLinkLabel = "Triage query (Azure DevOps)";
+const defaultLinkUrl = "https://aka.ms/learn-azure-triage";
+const defaultLinkIsDisabled = true;
 
-let delay = function (timeInMilliseconds) {
+const delay = function (timeInMilliseconds) {
     return new Promise(resolve => setTimeout(resolve, timeInMilliseconds));
 }
 
-// TODO: Get this using the flag for first-set.
-let getHasSetCustomAnchor = async function () {
-    return (await storageHelper.storageSyncGetAsync({ hasSetAnchor: false })).hasSetAnchor;
-}
-let setHasSetCustomAnchor = async function () {
-    await storageHelper.storageSyncSetAsync({ hasSetAnchor: true });
-}
-let getTriageAnchor = async function () {
-    let currentSavedTriageAnchor = await storageHelper.storageSyncGetAsync(
+const getCustomLink = async function () {
+    let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
         {
-            triageAnchorLabel: null,
-            triageAnchorUrl: null
+            customLinkLabel: null,
+            customLinkUrl: null,
+            hasSetCustomLink: false,
+            isLinkDisabled: defaultLinkIsDisabled
         }
     );
-    console.log(currentSavedTriageAnchor);
-    return currentSavedTriageAnchor;
-};
-let setTriageAnchorToDefault = async function () {
 
-    let currentTriageAnchor = await getTriageAnchor();
-    if (currentTriageAnchor.triageAnchorLabel !== defaultTriageAnchorLabel
-        || currentTriageAnchor.triageAnchorUrl !== defaultTriageAnchorUrl) {
-        await setTriageAnchor(defaultTriageAnchorLabel, defaultTriageAnchorUrl);
-        displayCurrentTriageAnchorValues();
+    if (!currentSavedCustomLink.hasSetCustomLink) {
+        await resetCustomLinkClick();
+        currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
+            {
+                customLinkLabel: null,
+                customLinkUrl: null,
+                hasSetCustomLink: false,
+                isLinkDisabled: defaultLinkIsDisabled
+            }
+        );
     }
+
+    console.log(currentSavedCustomLink);
+    return currentSavedCustomLink;
 };
-let setTriageAnchor = async function (customTriageAnchorLabel, customTriageAnchorUrl) {
-    console.log(`Setting triage anchor: [${customTriageAnchorLabel}](${customTriageAnchorUrl})`);
-    await storageHelper.storageSyncSetAsync({
-        triageAnchorLabel: customTriageAnchorLabel,
-        triageAnchorUrl: customTriageAnchorUrl
-    });
-};
-let displayCurrentTriageAnchorValues = async function () {
-    let currentTriageAnchor = await getTriageAnchor();
-    // TODO: Get this using the flag for first-set.
-    // BROKEN!!!
-    if (currentTriageAnchor.triageAnchorLabel === null
-        || currentTriageAnchor.triageAnchorUrl === null) {
-        await setTriageAnchorToDefault();
+const setCustomLink = async function (customLinkLabel, customLinkUrl, isLinkDisabled) {
+    console.log(`Setting custom link: [${customLinkLabel}](${customLinkUrl}) (${isLinkDisabled})`);
+    let newLink = {
+        customLinkLabel: customLinkLabel,
+        customLinkUrl: customLinkUrl,
+        hasSetCustomLink: false,
+        isLinkDisabled: isLinkDisabled
+    };
+    if (customLinkUrl !== null && customLinkLabel !== null) {
+        newLink.hasSetCustomLink = true;
     }
-    customLinkLabel.textContent = currentTriageAnchor.triageAnchorLabel;
-    newCustomLinkLabelInput.value = currentTriageAnchor.triageAnchorLabel;
-    customLinkUrl.textContent = currentTriageAnchor.triageAnchorUrl;
-    newCustomLinkUrlInput.value = currentTriageAnchor.triageAnchorUrl;
+    await storageHelper.storageSyncSetAsync(newLink);
+};
+const toggleCustomLinkIsDisabled = async function (isDisabled) {
+    const currentSavedCustomLink = await getCustomLink();
+    setCustomLink(currentSavedCustomLink.customLinkLabel, currentSavedCustomLink.customLinkUrl, isDisabled);
+};
+const resetCustomLinkToDefault = async function () {
+    await setCustomLink(defaultLinkLabel, defaultLinkUrl, defaultLinkIsDisabled);
+};
+
+const displayCurrentLinkValues = async function () {
+    let currentCustomLink = await getCustomLink();
+    customLinkLabel.textContent = currentCustomLink.customLinkLabel;
+    newCustomLinkLabelInput.value = currentCustomLink.customLinkLabel;
+    customLinkUrl.textContent = currentCustomLink.customLinkUrl;
+    newCustomLinkUrlInput.value = currentCustomLink.customLinkUrl;
+    const disableLinkToggleText = `${currentCustomLink.isLinkDisabled ? "Show" : "Hide"} link`;
+    disableCustomLinkButton.textContent = disableLinkToggleText;
+    disableCustomLinkButton.value = currentCustomLink.isLinkDisabled ? "show" : "hide";
 }
 
-let setCustomLinkClick = async function (event) {
-    let newLabel = newCustomLinkLabelInput.value;
-    let newUrl = newCustomLinkUrlInput.value;
-    setTriageAnchor(newLabel, newUrl);
+const setCustomLinkClick = async function (event) {
+    const newLabel = newCustomLinkLabelInput.value;
+    const newUrl = newCustomLinkUrlInput.value;
+    setCustomLink(newLabel, newUrl);
+};
+const resetCustomLinkClick = async function (event) {
+    await confirm("Reset custom link to default?", resetCustomLinkToDefault);
+    await displayCurrentLinkValues();
+};
+
+const disableCustomLink = async function () {
+    const nextIsDisabledState = disableCustomLinkButton.value === "hide" ? true : false;
+    await toggleCustomLinkIsDisabled(nextIsDisabledState);
+    await displayCurrentLinkValues();
+};
+const disableCustomLinkClick = async function (event) {
+    await confirm("Toggle custom link display?", disableCustomLink);
+    await displayCurrentLinkValues();
+};
+
+const confirm = async function (message, action) {
+    const didConfirm = window.confirm(message);
+    if (didConfirm) {
+        await action();
+    }
 };
 
 setCustomLinkLabelButton.addEventListener("click", setCustomLinkClick);
-document.addEventListener('DOMContentLoaded', displayCurrentTriageAnchorValues);
+resetCustomLinkButton.addEventListener("click", resetCustomLinkClick);
+disableCustomLinkButton.addEventListener("click", disableCustomLinkClick);
+document.addEventListener('DOMContentLoaded', displayCurrentLinkValues);

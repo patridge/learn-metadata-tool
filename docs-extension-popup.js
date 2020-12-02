@@ -7,6 +7,8 @@ let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
+let customLink = document.getElementById("customLink");
+const customLinkSection = document.getElementById("customLinkSection");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
@@ -90,26 +92,30 @@ chrome.tabs.query({ active: true, currentWindow: true },
     }
 );
 
-let getTriageAnchor = async function () {
-    let currentSavedTriageAnchor = await storageHelper.storageSyncGetAsync(
+let getCustomLink = async function () {
+    let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
         {
-            triageAnchorLabel: null,
-            triageAnchorUrl: null
+            customLinkLabel: null,
+            customLinkUrl: null,
+            hasSetCustomLink: false,
+            isLinkDisabled: true
         }
     );
-    console.log(currentSavedTriageAnchor);
-    return currentSavedTriageAnchor;
+    console.log(currentSavedCustomLink);
+    return currentSavedCustomLink;
 };
-let displayTriageAnchor = async () => {
-    // If user has saved a custom triage URL, overwrite the default.
-    let customTriageAnchorDetails = await getTriageAnchor();
-    if (customTriageAnchorDetails) {
-        if (customTriageAnchorDetails.triageAnchorUrl) {
-            triageAnchor.setAttribute("href", customTriageAnchorDetails.triageAnchorUrl);
-        }
-        if (customTriageAnchorDetails.triageAnchorLabel) {
-            triageAnchor.text = customTriageAnchorDetails.triageAnchorLabel;
+let displayCustomLink = async () => {
+    customLinkSection.style.display = "none";
+    const customLinkDetails = await getCustomLink();
+    const showCustomLink = !(customLinkDetails?.isLinkDisabled ?? true);
+    if (showCustomLink) {
+        if (customLinkDetails.customLinkUrl) {
+            customLinkSection.style.display = "block";
+            customLink.setAttribute("href", customLinkDetails.customLinkUrl);
+            if (customLinkDetails.customLinkLabel) {
+                customLink.text = customLinkDetails.customLinkLabel;
+            }
         }
     }
 };
-displayTriageAnchor();
+displayCustomLink();
