@@ -33,13 +33,13 @@ let displayMetadata = function (metadata) {
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
-        contentYamlGitUrlAnchor.removeAttribute('href');
+        contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
-        contentMarkdownGitUrlAnchor.removeAttribute('href');
+        contentMarkdownGitUrlAnchor.removeAttribute("href");
     }
 
     // For related items, search for immediate UID and next level up

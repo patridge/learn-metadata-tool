@@ -100,4 +100,4 @@ const confirm = async function (message, action) {
 setCustomLinkLabelButton.addEventListener("click", setCustomLinkClick);
 resetCustomLinkButton.addEventListener("click", resetCustomLinkClick);
 disableCustomLinkButton.addEventListener("click", disableCustomLinkClick);
-document.addEventListener('DOMContentLoaded', displayCurrentLinkValues);
+document.addEventListener("DOMContentLoaded", displayCurrentLinkValues);
