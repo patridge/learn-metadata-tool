@@ -73,10 +73,11 @@ const displayCurrentLinkValues = async function () {
 const setCustomLinkClick = async function (event) {
     const newLabel = newCustomLinkLabelInput.value;
     const newUrl = newCustomLinkUrlInput.value;
-    setCustomLink(newLabel, newUrl);
+    await setCustomLink(newLabel, newUrl);
+    await displayStatus("Custom link values saved.");
 };
 const resetCustomLinkClick = async function (event) {
-    await confirm("Reset custom link to default?", resetCustomLinkToDefault);
+    await confirm("Reset custom link to default?", resetCustomLinkToDefault, "Custom link settings reset.");
     await displayCurrentLinkValues();
 };
 
@@ -86,15 +87,23 @@ const disableCustomLink = async function () {
     await displayCurrentLinkValues();
 };
 const disableCustomLinkClick = async function (event) {
-    await confirm("Toggle custom link display?", disableCustomLink);
+    await confirm("Toggle custom link display?", disableCustomLink, "Custom link preference saved.");
     await displayCurrentLinkValues();
 };
 
-const confirm = async function (message, action) {
+const confirm = async function (message, action, successMessage) {
     const didConfirm = window.confirm(message);
     if (didConfirm) {
         await action();
+        if (successMessage) {
+            await displayStatus(successMessage);
+        }
     }
+};
+const displayStatus = async function (statusMessage) {
+    statusLabel.textContent = statusMessage;
+    await delay(1500);
+    statusLabel.textContent = "";
 };
 
 setCustomLinkLabelButton.addEventListener("click", setCustomLinkClick);
