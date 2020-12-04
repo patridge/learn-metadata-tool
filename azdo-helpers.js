@@ -56,7 +56,7 @@
             }
             else {
                 // Found a work item control without a label.
-                // TODO: Decide if there are values we need to handle differently from these edge cases.
+                // NOTE: It's possible there are values we need to handle differently from these edge cases. We can log them when we find them.
                 // console.log({ "msg": "No label or input", control });
             }
         });

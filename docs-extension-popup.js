@@ -7,6 +7,8 @@ let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
+let customLink = document.getElementById("customLink");
+const customLinkSection = document.getElementById("customLinkSection");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
@@ -31,13 +33,13 @@ let displayMetadata = function (metadata) {
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
-        contentYamlGitUrlAnchor.removeAttribute('href');
+        contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
-        contentMarkdownGitUrlAnchor.removeAttribute('href');
+        contentMarkdownGitUrlAnchor.removeAttribute("href");
     }
 
     // For related items, search for immediate UID and next level up
@@ -89,3 +91,31 @@ chrome.tabs.query({ active: true, currentWindow: true },
         }
     }
 );
+
+let getCustomLink = async function () {
+    let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
+        {
+            customLinkLabel: null,
+            customLinkUrl: null,
+            hasSetCustomLink: false,
+            isLinkDisabled: true
+        }
+    );
+    console.log(currentSavedCustomLink);
+    return currentSavedCustomLink;
+};
+let displayCustomLink = async () => {
+    customLinkSection.style.display = "none";
+    const customLinkDetails = await getCustomLink();
+    const showCustomLink = !(customLinkDetails?.isLinkDisabled ?? true);
+    if (showCustomLink) {
+        if (customLinkDetails.customLinkUrl) {
+            customLinkSection.style.display = "block";
+            customLink.setAttribute("href", customLinkDetails.customLinkUrl);
+            if (customLinkDetails.customLinkLabel) {
+                customLink.text = customLinkDetails.customLinkLabel;
+            }
+        }
+    }
+};
+displayCustomLink();

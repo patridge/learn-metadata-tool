@@ -1,3 +1,5 @@
+// NOTE: When this was written, we didn't know that a `null` tab ID would use the current tab.
+// TODO: Determine if all the tab query and ID stuff here could instead by replaced with `null` tabId (defaults to current window per docs [https://developer.chrome.com/extensions/tabs#method-executeScript]).
 let setPopUpByTabId = function (tabId) {
     if (!tabId) { return; }
 
@@ -10,7 +12,7 @@ let setPopUpByTabId = function (tabId) {
         if (host.endsWith("docs.microsoft.com")) {
             chrome.browserAction.setPopup({
                 tabId: tabId,
-                popup: "learn-extension-popup.html"
+                popup: "docs-extension-popup.html"
             });
         }
         else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {

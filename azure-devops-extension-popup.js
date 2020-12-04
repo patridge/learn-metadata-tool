@@ -1,4 +1,6 @@
 // NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
+const defaultTriageAnchorLabel = "Triage query (Azure DevOps)";
+const defaultTriageAnchorUrl = "https://aka.ms/learn-azure-triage";
 let uidSpan = document.getElementById("uid");
 let contentUrl = document.getElementById("contentUrl");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
@@ -7,11 +9,13 @@ let msAuthorSpan = document.getElementById("msAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let customLink = document.getElementById("customLink");
+const customLinkSection = document.getElementById("customLinkSection");
 
-// TODO: Refactor: duplicated in learn-extension-popup.html.
+// TODO: Refactor: duplicated in docs-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
-copyButtons.forEach(btn => {
-    btn.onclick = async function(element) {
+copyButtons.forEach(function (btn) {
+    btn.onclick = async function (element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
         let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
@@ -60,7 +64,7 @@ let displayWorkItemData = async function (workItemData) {
         contentUrl.setAttribute("href", learnUrl);
     }
     else {
-        contentUrl.removeAttribute('href');
+        contentUrl.removeAttribute("href");
     }
 };
 let displayContentPageMetadata = function (metadata) {
@@ -71,13 +75,13 @@ let displayContentPageMetadata = function (metadata) {
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
-        contentYamlGitUrlAnchor.removeAttribute('href');
+        contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
-        contentMarkdownGitUrlAnchor.removeAttribute('href');
+        contentMarkdownGitUrlAnchor.removeAttribute("href");
     }
 };
 
@@ -172,7 +176,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                 displayContentPageMetadata(metaTags);
 
-                // Sending response asyncronously.
+                // Sending response asynchronously.
                 sendResponse(
                     {
                         result: "success"
@@ -180,7 +184,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 );
             });
 
-            // Return true to tell Chrome we are returning this response asyncronously.
+            // Return true to tell Chrome we are returning this response asynchronously.
             return true;
             break;
     }
@@ -205,3 +209,31 @@ chrome.tabs.query({ active: true, currentWindow: true },
         }
     }
 );
+
+let getCustomLink = async function () {
+    let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
+        {
+            customLinkLabel: null,
+            customLinkUrl: null,
+            hasSetCustomLink: false,
+            isLinkDisabled: true
+        }
+    );
+    console.log(currentSavedCustomLink);
+    return currentSavedCustomLink;
+};
+let displayCustomLink = async () => {
+    customLinkSection.style.display = "none";
+    const customLinkDetails = await getCustomLink();
+    const showCustomLink = !(customLinkDetails?.isLinkDisabled ?? true);
+    if (showCustomLink) {
+        if (customLinkDetails.customLinkUrl) {
+            customLinkSection.style.display = "block";
+            customLink.setAttribute("href", customLinkDetails.customLinkUrl);
+            if (customLinkDetails.customLinkLabel) {
+                customLink.text = customLinkDetails.customLinkLabel;
+            }
+        }
+    }
+};
+displayCustomLink();

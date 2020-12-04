@@ -2,7 +2,7 @@
 
 Determine the author of a given Microsoft Learn or Microsoft Docs page. And quickly navigate to the content in GitHub to propose edits. This tool was created for the Microsoft Learn content team to help triage user-reported feedback to the right maintainer, but anyone is welcome to use it if it helps them.
 
-![Screenshot of the Microsoft Learn maintenance tool Chrome extension showing a page's author, date, and edit link metadata loaded.](media/extension-screenshot-large-v0.2.5.png)
+![Screenshot of the Microsoft Learn Maintenance Tool Chrome extension showing a page's author, date, and edit link metadata loaded.](media/extension-screenshot-large-v0.2.5.png)
 
 ## Features
 
@@ -20,7 +20,24 @@ This is the information currently being extracted:
 
 ### View Microsoft Learn content page from Azure DevOps customer feedback work items
 
-When you are viewing a customer feedback work item for a Microsoft Learn page the Learn Maintenance Tool extension will show a pop-up with some userful metadata fields and a link to view other open feedback for this unit and parent module as well as any customer feedback rating verbatims. This way, you can tackle several work items in a single maintenance session.
+When you are viewing a customer feedback work item for a Microsoft Learn page the Learn Maintenance Tool extension will show a pop-up with some useful metadata fields and a link to view other open feedback for this unit and parent module as well as any customer feedback rating verbatims. This way, you can tackle several work items in a single maintenance session.
+
+### Optional pop-up link
+
+If you regularly need to go to a page as part of your maintenance efforts, you can have the Learn Maintenance Tool pop-up offer a link to that page to have it handy at all times.
+
+![Screenshot of the Microsoft Learn Maintenance Tool pop-up showing a custom link, highlighted, with a title of "Cat Overflow".](media/extension-popup-custom-link.png)
+
+This link is hidden by default, but can be enabled and configured in the extension options page.
+
+1. Right-click the extension button in your browser and select **Options**. You can also find an **Extension options** link to select from the extension details.
+
+    ![Screenshot of the Microsoft Learn Maintenance Tool Chrome extension menu showing the Options entry highlighted.](media/extension-menu-options.png)
+
+1. Within the options, first enable the link by selecting the **Show link** button and confirming you want to enable it. (To disable it when it is shown, select the **Hide link** button and confirm.)
+1. To customize the link name or URL the link navigates to, edit the **Set link label** and **Set link URL** fields and select the **Set custom link** button.
+
+The next time you open the extension pop-up your link should be shown and will open in a new tab.
 
 ## Installation
 
@@ -64,6 +81,7 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 * [v0.7.2] Fix for missing Markdown edit link after Learn switched metadata fields (#45)
 * [v0.7.3] Get content URL properly from Technical Review work items in Azure DevOps
 * [v0.7.3] Also offer related issues/verbatims from Learn pages (no longer just on Azure DevOps work items)
+* [v0.7.4] Add optional custom link to pop-up window for common maintenance page (defaults to Learn Azure team's triage query on Azure DevOps)
 
 ### v0.6
 
@@ -79,7 +97,6 @@ Here are the current plans for upcoming releases. These are definitely subject t
 
 ### v0.8+: Customization
 
-* Offer a customizable URL to take you to an Azure DevOps query of your choice
 * Allow customizing which metadata fields are important to you
 
 ### Future plans and suggestions

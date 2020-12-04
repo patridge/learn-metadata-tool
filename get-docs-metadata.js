@@ -53,7 +53,7 @@
     let sendPopUpUpdateRequest = function (pageMetadata) {
         chrome.runtime.sendMessage(
             {
-                method: 'metadataCollected',
+                method: "metadataCollected",
                 data: pageMetadata
             },
             function (response) {
