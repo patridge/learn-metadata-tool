@@ -24,7 +24,7 @@ const getCustomLink = async function () {
     );
 
     if (!currentSavedCustomLink.hasSetCustomLink) {
-        await resetCustomLinkClick();
+        await resetCustomLinkToDefault();
         currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
             {
                 customLinkLabel: null,
