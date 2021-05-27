@@ -5,6 +5,7 @@ const setCustomLinkUrlButton = document.getElementById("setNewCustomLinkUrl");
 const resetCustomLinkButton = document.getElementById("resetCustomLink");
 const statusLabel = document.getElementById("status");
 const disableCustomLinkButton = document.getElementById("disableCustomLink");
+const metadataTagNamesList = document.getElementById("metadataTagNames");
 const defaultLinkLabel = "Triage query (Azure DevOps)";
 const defaultLinkUrl = "https://aka.ms/learn-azure-triage";
 const defaultLinkIsDisabled = true;
@@ -12,6 +13,20 @@ const defaultLinkIsDisabled = true;
 const delay = function (timeInMilliseconds) {
     return new Promise(resolve => setTimeout(resolve, timeInMilliseconds));
 }
+const confirm = async function (message, action, successMessage) {
+    const didConfirm = window.confirm(message);
+    if (didConfirm) {
+        await action();
+        if (successMessage) {
+            await displayStatus(successMessage);
+        }
+    }
+};
+const displayStatus = async function (statusMessage) {
+    statusLabel.textContent = statusMessage;
+    await delay(1500);
+    statusLabel.textContent = "";
+};
 
 const getCustomLink = async function () {
     let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
@@ -91,19 +106,53 @@ const disableCustomLinkClick = async function (event) {
     await displayCurrentLinkValues();
 };
 
-const confirm = async function (message, action, successMessage) {
-    const didConfirm = window.confirm(message);
-    if (didConfirm) {
-        await action();
-        if (successMessage) {
-            await displayStatus(successMessage);
+let getMetadataSettings = async function () {
+    let getMetadataSettings = await storageHelper.storageSyncGetAsync(
+        {
+            hasEverBeenSet: false,
+            metadataTags: []
         }
+    );
+
+    if (!getMetadataSettings.hasEverBeenSet) {
+        await resetMetadataTagNamesToDefault();
+        getMetadataSettings = await storageHelper.storageSyncGetAsync(
+            {
+                hasEverBeenSet: false,
+                metadataTags: []
+            }
+        );
     }
+
+    console.log(currentSavedMetadataTagNames);
+    return currentSavedMetadataTagNames;
 };
-const displayStatus = async function (statusMessage) {
-    statusLabel.textContent = statusMessage;
-    await delay(1500);
-    statusLabel.textContent = "";
+const addMetadataTag = async function (newMetadataTag) {
+    console.log(`Adding metadata: [${customLinkLabel}](${customLinkUrl}) (${isLinkDisabled})`);
+    let newMetadataSettings = {
+        customLinkLabel: customLinkLabel,
+        customLinkUrl: customLinkUrl,
+        hasSetCustomLink: false,
+        isLinkDisabled: isLinkDisabled
+    };
+    if (customLinkUrl !== null && customLinkLabel !== null) {
+        newMetadataSettings.hasSetCustomLink = true;
+    }
+    await storageHelper.storageSyncSetAsync(newMetadataSettings);
+};
+let resetMetadataTagNamesToDefault = async function () {
+    console.log(`Resetting metadata tag names to default`);
+    const defaultLearnMetadataTags = [
+        { name: "ms.author", copy: true },
+        { name: "author", copy: true },
+        { name: "UID", copy: true },
+        { name: "ms.date", copy: false }
+    ];
+    const defaultMetadataSettings = {
+        hasSetMetadataTagNames: true,
+        metadataTags = defaultLearnMetadataTags
+    };
+    await storageHelper.storageSyncSetAsync(newMetadataSettings);
 };
 
 setCustomLinkLabelButton.addEventListener("click", setCustomLinkClick);
