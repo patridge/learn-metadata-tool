@@ -5,6 +5,7 @@ let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
 let customLink = document.getElementById("customLink");
@@ -40,6 +41,12 @@ let displayMetadata = function (metadata) {
     }
     else {
         contentMarkdownGitUrlAnchor.removeAttribute("href");
+    }
+    if (metadata.gitHubNotebookLocation) {
+        contentNotebookGitUrlAnchor.setAttribute("href", metadata.gitHubNotebookLocation);
+    }
+    else {
+        contentNotebookGitUrlAnchor.removeAttribute("href");
     }
 
     // For related items, search for immediate UID and next level up

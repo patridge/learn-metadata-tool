@@ -9,6 +9,7 @@ let msAuthorSpan = document.getElementById("msAuthor");
 let msDateSpan = document.getElementById("msDate");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook");
 let customLink = document.getElementById("customLink");
 const customLinkSection = document.getElementById("customLinkSection");
 
@@ -82,6 +83,12 @@ let displayContentPageMetadata = function (metadata) {
     }
     else {
         contentMarkdownGitUrlAnchor.removeAttribute("href");
+    }
+    if (metadata.gitHubNotebookLocation) {
+        contentNotebookGitUrlAnchor.setAttribute("href", metadata.gitHubNotebookLocation);
+    }
+    else {
+        contentNotebookGitUrlAnchor.removeAttribute("href");
     }
 };
 
