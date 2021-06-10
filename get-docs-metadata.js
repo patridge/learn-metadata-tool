@@ -3,6 +3,9 @@
     // storageLocalRemoveAsync([ location ]);
     let getCurrentPageMetadata = function (rootElement) {
         let metaTags = rootElement.getElementsByTagName("meta");
+        let localeTag = [...metaTags].filter(meta => meta.getAttribute("name") === "locale")[0];
+        let localeCode = localeTag ? localeTag.getAttribute("content").toLowerCase() : "en-us";
+        let isEnUsLocale = localeCode === "en-us";
         let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
         let uid = uidTag ? uidTag.getAttribute("content") : "";
         let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
@@ -17,7 +20,8 @@
             // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
             let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
             // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
-            let gitEditUrl = gitUrl.replace("/live/", "/master/");
+            // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
+            let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
             let gitYamlEditUrl = null;
             let gitMarkdownEditUrl = null;
             if (gitEditUrl.endsWith("/index.yml")) {
