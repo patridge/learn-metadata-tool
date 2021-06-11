@@ -7,8 +7,12 @@ let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItems
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
 let msAuthorSpan = document.getElementById("msAuthor");
 let msDateSpan = document.getElementById("msDate");
+let contentYamlSourceSpan = document.getElementById("yamlSourceSpan");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
+let contentMarkdownSourceSpan = document.getElementById("markdownSourceSpan");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let contentNotebookSourceSpan = document.getElementById("notebookSourceSpan");
+let contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook");
 let customLink = document.getElementById("customLink");
 const customLinkSection = document.getElementById("customLinkSection");
 
@@ -72,16 +76,28 @@ let displayContentPageMetadata = function (metadata) {
     msDateSpan.textContent = metadata.msDateMetaTagValue;
 
     if (metadata.gitHubYamlLocation) {
+        contentYamlSourceSpan.style.display = "inline";
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
+        contentYamlSourceSpan.style.display = "none";
         contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
+        contentMarkdownSourceSpan.style.display = "inline";
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
+        contentMarkdownSourceSpan.style.display = "none";
         contentMarkdownGitUrlAnchor.removeAttribute("href");
+    }
+    if (metadata.gitHubNotebookLocation) {
+        contentNotebookSourceSpan.style.display = "inline";
+        contentNotebookGitUrlAnchor.setAttribute("href", metadata.gitHubNotebookLocation);
+    }
+    else {
+        contentNotebookSourceSpan.style.display = "none";
+        contentNotebookGitUrlAnchor.removeAttribute("href");
     }
 };
 
