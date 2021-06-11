@@ -44,6 +44,10 @@
             // NOTE: Currently limited to Learn in the URL manipulation below, but if notebooks start showing up elsewhere in Docs we'll have to adjust.
             let notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
             let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") : "";
+            if (notebookPublicUrl && notebookPublicUrl.startsWith("/learn/modules")) {
+                // TODO: Make any new relative notebook URLs absolute to match prior expectations.
+                notebookPublicUrl = "https://docs.microsoft.com" + notebookPublicUrl;
+            }
             // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL.
             //       GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
             //       Learn-hosted example: https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
