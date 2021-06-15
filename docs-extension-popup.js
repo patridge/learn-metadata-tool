@@ -16,14 +16,14 @@ const customLinkSection = document.getElementById("customLinkSection");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
-    btn.onclick = async function(element) {
+    btn.addEventListener("click", async function(element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
         let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
         let copyValue = copyTarget && copyTarget.innerText;
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
-    };
+    });
 });
 
 let displayMetadata = function (metadata) {
