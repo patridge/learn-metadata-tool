@@ -23,14 +23,7 @@ let setPopUpByTabId = function (tabId) {
         }
     });
 }
-let setPopUpViaActiveTabQuery = function () {
-    chrome.tabs.query({ active: true, currentWindow: true },
-        function(tabs) {
-            let tabId = tabs[0]?.id;
-            setPopUpByTabId(tabId);
-        }
-    );
-}
+
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         // TODO: Find out if conditions in the array are AND or OR. If OR, we can combine them both (possible example evidence for OR: https://github.com/kudos/combine.fm/blob/8ea8b4d279bf411064cf1328710e8a343fe021d5/chrome/src/background.js#L5-L42).
