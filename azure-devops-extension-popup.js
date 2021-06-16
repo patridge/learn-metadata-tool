@@ -19,14 +19,14 @@ const customLinkSection = document.getElementById("customLinkSection");
 // TODO: Refactor: duplicated in docs-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(function (btn) {
-    btn.onclick = async function (element) {
+    btn.addEventListener("click", async function(element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
-        let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
+        let siblingCopyTargets = [...btn.parentElement.parentElement.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
-        let copyValue = copyTarget && copyTarget.innerText;
+        let copyValue = copyTarget?.innerText ?? "";
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
-    };
+    });
 });
 
 let displayWorkItemData = async function (workItemData) {
@@ -104,6 +104,9 @@ let displayContentPageMetadata = function (metadata) {
 // TODO: Refactor, extremely similar to method from get-docs-metadata.js (except with different root from `document`).
 let getCurrentPageMetadata = function (rootElement) {
     let metaTags = rootElement.getElementsByTagName("meta");
+    let localeTag = [...metaTags].filter(meta => meta.getAttribute("name") === "locale")[0];
+    let localeCode = localeTag ? localeTag.getAttribute("content").toLowerCase() : "en-us";
+    let isEnUsLocale = localeCode === "en-us";
     let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
     let uid = uidTag ? uidTag.getAttribute("content") : "";
     let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
@@ -118,7 +121,8 @@ let getCurrentPageMetadata = function (rootElement) {
         // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
         let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
         // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
-        let gitEditUrl = gitUrl.replace("/live/", "/master/");
+        // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
+        let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
         let gitYamlEditUrl = null;
         let gitMarkdownEditUrl = null;
         if (gitEditUrl.endsWith("/index.yml")) {
@@ -136,9 +140,53 @@ let getCurrentPageMetadata = function (rootElement) {
             gitYamlEditUrl = null;
             gitMarkdownEditUrl = gitEditUrl;
         }
+
+        // NOTE: Currently limited to Learn in the URL manipulation below, but if notebooks start showing up elsewhere in Docs we'll have to adjust.
+        let notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
+        let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") : "";
+        if (notebookPublicUrl && notebookPublicUrl.startsWith("/learn/modules")) {
+            // TODO: Make any new relative notebook URLs absolute to match prior expectations.
+            notebookPublicUrl = "https://docs.microsoft.com" + notebookPublicUrl;
+        }
+        // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL.
+        //       GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
+        //       Learn-hosted example: https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
+        /** @type string */
+        let gitNotebookEditUrl = null;
+        if (notebookPublicUrl) {
+            if (notebookPublicUrl.startsWith("https://raw.githubusercontent.com/")) {
+                // e.g., "https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/2-understand-audio-data.ipynb" => "https://github.com/MicrosoftDocs/pytorchfundamentals/blob/main/audio-pytorch/2-understand-audio-data.ipynb"
+                let defaultBranchRegex = new RegExp("/(?<branch>(main)|(master))/", "i");
+                gitNotebookEditUrl = notebookPublicUrl.replace(defaultBranchRegex, "/blob/$<branch>/").replace("https://raw.githubusercontent.com/", "https://github.com/");
+            }
+            else if (notebookPublicUrl.startsWith("https://docs.microsoft.com/learn/")) {
+                // Fairly certain all Learn modules have a YAML file, so starting from that previously dissected URL.
+                // Assume notebook is in the same content repo as the current Learn module.
+                if (gitYamlEditUrl) {
+                    // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+
+                    const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
+                    const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") : "";
+
+                    const learnModuleUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/[a-z]{2}-[a-z]{2}/learn/modules/(?<moduleAndUnit>[^?#]*)", "i");
+                    const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
+                    // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "count-moon-rocks-python-nasa/2-set-up-program"
+
+                    const learnNotebookUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/([a-z]{2}-[a-z]{2}/)?learn/modules/(?<notebookPath>[^?#]*)", "i");
+                    const moduleNotebookPathSections = notebookPublicUrl.replace(learnNotebookUrlRegex, "$<notebookPath>");
+                    // e.g., "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb" => "count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+
+                    const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
+                    gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
+                    // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/master/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                }
+            }
+        }
+
         return {
             gitYamlEditUrl,
-            gitMarkdownEditUrl
+            gitMarkdownEditUrl,
+            gitNotebookEditUrl,
         };
     })(metaTags);
 
@@ -149,6 +197,7 @@ let getCurrentPageMetadata = function (rootElement) {
         msDateMetaTagValue: msDate,
         gitHubYamlLocation: gitUrlValues.gitYamlEditUrl,
         gitHubMarkdownLocation: gitUrlValues.gitMarkdownEditUrl,
+        gitHubNotebookLocation: gitUrlValues.gitNotebookEditUrl,
     };
 };
 
@@ -211,9 +260,10 @@ chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
         const azureDevOpsPageScript = "azdo-helpers.js";
+        let activeTab = tabs[0];
         let tempAnchor = document.createElement("a");
-        tempAnchor.href = tabs[0].url;
-        let tabId = tabs[0].id;
+        tempAnchor.href = activeTab.url;
+        let tabId = activeTab.id;
         let host = tempAnchor.hostname;
         if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
             chrome.tabs.executeScript(
