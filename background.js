@@ -5,9 +5,16 @@ let setPopUpByTabId = function (tabId) {
 
     chrome.tabs.get(tabId, function (tab) {
         // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
+
+        // Sometimes Chrome will record a pair of error messages in the extension log when accessing `tab` that doesn't make sense [yet]. They definitely do not align with tabs being actively edited, though. It seems to happen when reloading the extension and switching tabs via click. (Avoided when switching via Ctrl[+Shift]+Tab for some reason.)
+        // > Unchecked runtime.lastError: Tabs cannot be edited right now (user may be dragging a tab).
+        // > Error handling response: TypeError: Cannot read property 'id' of undefined
+        // A try-catch around these two `tab.*` calls was supposed to keep that noise from polluting the extension log, but didn't appear to help at all.
         let tabId = tab.id;
+        let tabUrl = tab.url;
+
         let tempAnchor = document.createElement("a");
-        tempAnchor.href = tab.url;
+        tempAnchor.href = tabUrl;
         let host = tempAnchor.hostname;
         if (host.endsWith("docs.microsoft.com")) {
             chrome.browserAction.setPopup({
