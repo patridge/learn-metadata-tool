@@ -1,4 +1,12 @@
+// NOTE: Cannot `@ts-check` typecheck file until we figure out representing `chrome.runtime` in JSDoc. Tried `@type`, `@global`, `@typedef` (more a variable; not a type), `@member/@var`, and `@external`.
+
 // NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
+
+/**
+ * @typedef {Object} WorkItemData
+ */
+
+// TODO: Make an immediately executing function to avoid false-positive name collisions in ts-check system.
 const defaultTriageAnchorLabel = "Triage query (Azure DevOps)";
 const defaultTriageAnchorUrl = "https://aka.ms/learn-azure-triage";
 let uidSpan = document.getElementById("uid");
@@ -19,21 +27,25 @@ const customLinkSection = document.getElementById("customLinkSection");
 // TODO: Refactor: duplicated in docs-extension-popup.html.
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(function (btn) {
+    /** @param {Element} element - Copy button being clicked. */
     btn.addEventListener("click", async function(element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
+        /** @type Element[] */
         let siblingCopyTargets = [...btn.parentElement.parentElement.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
+        // NOTE: Cannot ts-check here because getElementsByClassName returns Elements and not HTMLElements, meaning .innerText isn't available.
         let copyValue = copyTarget?.innerText ?? "";
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
     });
 });
 
+/**
+ * @param {WorkItemData} workItemData - Azure DevOps work item's gathered details.
+ */
 let displayWorkItemData = async function (workItemData) {
     // NOTE: Semi-brittle here, since AzDO fields can have custom labels. Fields show the raw field name in a hover on the label, but I can't seem to find where that data is hiding in the rendered HTML yet. For module work items, the UID field is aliased as "Module UID", so we have to look there as a fallback.
-    /**
-     * @type {string}
-     */
+    /** @type {string} */
     let uid = workItemData.UID || workItemData["Module UID"];
     if (uid) {
         uidSpan.textContent = uid;
@@ -63,6 +75,7 @@ let displayWorkItemData = async function (workItemData) {
 
     // NOTE: Module work items won't have a URL field, so we don't get a link for those work items.
     // NOTE: For Technical Review items, the content URL is labeled "Published URL".
+    /** @type string */
     let learnUrl = workItemData.URL || workItemData["Published URL"];
     if (learnUrl) {
         contentUrl.setAttribute("href", learnUrl);
@@ -71,6 +84,9 @@ let displayWorkItemData = async function (workItemData) {
         contentUrl.removeAttribute("href");
     }
 };
+/**
+ * @param {PageMetadata} metadata - Page's gathered metadata
+ */
 let displayContentPageMetadata = function (metadata) {
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
     msDateSpan.textContent = metadata.msDateMetaTagValue;
@@ -102,6 +118,10 @@ let displayContentPageMetadata = function (metadata) {
 };
 
 // TODO: Refactor, extremely similar to method from get-docs-metadata.js (except with different root from `document`).
+/**
+ * @param {Element} rootElement
+ * @returns {PageMetadata}
+ */
 let getCurrentPageMetadata = function (rootElement) {
     let metaTags = rootElement.getElementsByTagName("meta");
     let localeTag = [...metaTags].filter(meta => meta.getAttribute("name") === "locale")[0];
@@ -123,8 +143,11 @@ let getCurrentPageMetadata = function (rootElement) {
         // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
         // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
         let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
+        /** @type string */
         let gitYamlEditUrl = null;
+        /** @type string */
         let gitMarkdownEditUrl = null;
+
         if (gitEditUrl.endsWith("/index.yml")) {
             // Learn has index pages that are generated entirely from a YAML page.
             gitYamlEditUrl = gitEditUrl;
@@ -214,6 +237,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             );
             break;
         case "requestLearnContentPage":
+            /** @type string */
             let contentUrl = request?.data?.url;
             if (!contentUrl) {
                 sendResponse(
@@ -276,6 +300,9 @@ chrome.tabs.query({ active: true, currentWindow: true },
     }
 );
 
+/**
+ * @returns {Promise<string>}
+ */
 let getCustomLink = async function () {
     let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
         {

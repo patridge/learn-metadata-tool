@@ -1,3 +1,6 @@
+// NOTE: Cannot `@ts-check` typecheck file until we figure out representing `chrome.runtime` in JSDoc. Tried `@type`, `@global`, `@typedef` (more a variable; not a type), `@member/@var`, and `@external`.
+
+// TODO: Make an immediately executing function to avoid false-positive name collisions in ts-check system.
 // NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
 let uidSpan = document.querySelector("#uid");
 let msAuthorSpan = document.getElementById("msAuthor");
@@ -16,16 +19,21 @@ const customLinkSection = document.getElementById("customLinkSection");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
+    /** @param {Element} element - Copy button being clicked. */
     btn.addEventListener("click", async function(element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
         let siblingCopyTargets = [...btn.parentElement.parentElement.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
+        // NOTE: Cannot ts-check here because getElementsByClassName returns Elements and not HTMLElements, meaning .innerText isn't available.
         let copyValue = copyTarget?.innerText ?? "";
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
     });
 });
 
+/**
+ * @param {PageMetadata} metadata - Page's gathered metadata
+ */
 let displayMetadata = function (metadata) {
     let uid = metadata.uid;
     uidSpan.textContent = uid;
@@ -109,6 +117,9 @@ chrome.tabs.query({ active: true, currentWindow: true },
     }
 );
 
+/**
+ * @returns {Promise<string>}
+ */
 let getCustomLink = async function () {
     let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
         {
