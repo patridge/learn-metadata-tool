@@ -197,6 +197,7 @@ let getCurrentPageMetadata = function (rootElement) {
         msDateMetaTagValue: msDate,
         gitHubYamlLocation: gitUrlValues.gitYamlEditUrl,
         gitHubMarkdownLocation: gitUrlValues.gitMarkdownEditUrl,
+        gitHubNotebookLocation: gitUrlValues.gitNotebookEditUrl,
     };
 };
 
