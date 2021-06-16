@@ -1,7 +1,10 @@
 // NOTE: When this was written, we didn't know that a `null` tab ID would use the current tab.
 // TODO: Determine if all the tab query and ID stuff here could instead by replaced with `null` tabId (defaults to current window per docs [https://developer.chrome.com/extensions/tabs#method-executeScript]).
 let setPopUpByTabId = function (tabId) {
-    if (!tabId) { return; }
+    if (!tabId) {
+        console.log(`Tab ID (${tabId}) wasn't provided?`);
+        return;
+    }
 
     chrome.tabs.get(tabId, function (tab) {
         // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
