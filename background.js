@@ -1,13 +1,23 @@
 // NOTE: When this was written, we didn't know that a `null` tab ID would use the current tab.
 // TODO: Determine if all the tab query and ID stuff here could instead by replaced with `null` tabId (defaults to current window per docs [https://developer.chrome.com/extensions/tabs#method-executeScript]).
 let setPopUpByTabId = function (tabId) {
-    if (!tabId) { return; }
+    if (!tabId) {
+        console.log(`Tab ID (${tabId}) wasn't provided?`);
+        return;
+    }
 
     chrome.tabs.get(tabId, function (tab) {
         // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
+
+        // Sometimes Chrome will record a pair of error messages in the extension log when accessing `tab` that doesn't make sense [yet]. They definitely do not align with tabs being actively edited, though. It seems to happen when reloading the extension and switching tabs via click. (Avoided when switching via Ctrl[+Shift]+Tab for some reason.)
+        // > Unchecked runtime.lastError: Tabs cannot be edited right now (user may be dragging a tab).
+        // > Error handling response: TypeError: Cannot read property 'id' of undefined
+        // A try-catch around these two `tab.*` calls was supposed to keep that noise from polluting the extension log, but didn't appear to help at all.
         let tabId = tab.id;
+        let tabUrl = tab.url;
+
         let tempAnchor = document.createElement("a");
-        tempAnchor.href = tab.url;
+        tempAnchor.href = tabUrl;
         let host = tempAnchor.hostname;
         if (host.endsWith("docs.microsoft.com")) {
             chrome.browserAction.setPopup({
@@ -23,14 +33,7 @@ let setPopUpByTabId = function (tabId) {
         }
     });
 }
-let setPopUpViaActiveTabQuery = function () {
-    chrome.tabs.query({ active: true, currentWindow: true },
-        function(tabs) {
-            let tabId = tabs[0]?.id;
-            setPopUpByTabId(tabId);
-        }
-    );
-}
+
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         // TODO: Find out if conditions in the array are AND or OR. If OR, we can combine them both (possible example evidence for OR: https://github.com/kudos/combine.fm/blob/8ea8b4d279bf411064cf1328710e8a343fe021d5/chrome/src/background.js#L5-L42).

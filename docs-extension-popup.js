@@ -3,8 +3,12 @@ let uidSpan = document.querySelector("#uid");
 let msAuthorSpan = document.getElementById("msAuthor");
 let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
 let msDateSpan = document.getElementById("msDate");
+let contentYamlSourceSpan = document.getElementById("yamlSourceSpan");
 let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
+let contentMarkdownSourceSpan = document.getElementById("markdownSourceSpan");
 let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
+let contentNotebookSourceSpan = document.getElementById("notebookSourceSpan");
+let contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook");
 let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
 let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
 let customLink = document.getElementById("customLink");
@@ -12,14 +16,14 @@ const customLinkSection = document.getElementById("customLinkSection");
 
 let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
 copyButtons.forEach(btn => {
-    btn.onclick = async function(element) {
+    btn.addEventListener("click", async function(element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
-        let siblingCopyTargets = [...btn.parentNode.parentNode.getElementsByClassName("copy-field-target")];
+        let siblingCopyTargets = [...btn.parentElement.parentElement.getElementsByClassName("copy-field-target")];
         let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
-        let copyValue = copyTarget && copyTarget.innerText;
+        let copyValue = copyTarget?.innerText ?? "";
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
-    };
+    });
 });
 
 let displayMetadata = function (metadata) {
@@ -30,16 +34,28 @@ let displayMetadata = function (metadata) {
     msDateSpan.textContent = metadata.msDateMetaTagValue;
 
     if (metadata.gitHubYamlLocation) {
+        contentYamlSourceSpan.style.display = "inline";
         contentYamlGitUrlAnchor.setAttribute("href", metadata.gitHubYamlLocation);
     }
     else {
+        contentYamlSourceSpan.style.display = "none";
         contentYamlGitUrlAnchor.removeAttribute("href");
     }
     if (metadata.gitHubMarkdownLocation) {
+        contentMarkdownSourceSpan.style.display = "inline";
         contentMarkdownGitUrlAnchor.setAttribute("href", metadata.gitHubMarkdownLocation);
     }
     else {
+        contentMarkdownSourceSpan.style.display = "none";
         contentMarkdownGitUrlAnchor.removeAttribute("href");
+    }
+    if (metadata.gitHubNotebookLocation) {
+        contentNotebookSourceSpan.style.display = "inline";
+        contentNotebookGitUrlAnchor.setAttribute("href", metadata.gitHubNotebookLocation);
+    }
+    else {
+        contentNotebookSourceSpan.style.display = "none";
+        contentNotebookGitUrlAnchor.removeAttribute("href");
     }
 
     // For related items, search for immediate UID and next level up
@@ -78,9 +94,10 @@ chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
         const microsoftLearnPageScript = "get-docs-metadata.js";
+        let activeTab = tabs[0];
         let tempAnchor = document.createElement("a");
-        tempAnchor.href = tabs[0].url;
-        let tabId = tabs[0].id;
+        tempAnchor.href = activeTab.url;
+        let tabId = activeTab.id;
         if (tempAnchor.hostname.endsWith("docs.microsoft.com")) {
             chrome.tabs.executeScript(
                 tabId,
