@@ -74,14 +74,16 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 ### v0.7
 
-* [v0.7.0] While on an Azure DevOps customer feedback work item, extract metadata from the target content page when the extension is activated
-* [v0.7.0] Extract UID from module work items
-* [v0.7.1] Azure DevOps: Handle when multiple work item structures exist in page HTML (#40)
-* [v0.7.1] Related work item query now only excludes star rating verbatims (#42)
-* [v0.7.2] Fix for missing Markdown edit link after Learn switched metadata fields (#45)
-* [v0.7.3] Get content URL properly from Technical Review work items in Azure DevOps
-* [v0.7.3] Also offer related issues/verbatims from Learn pages (no longer just on Azure DevOps work items)
+* [v0.7.5] Add support for notebook embedded content on Learn
+* [v0.7.5] Fix issues when navigating to source links from outside en-us locale
 * [v0.7.4] Add optional custom link to pop-up window for common maintenance page (defaults to Learn Azure team's triage query on Azure DevOps)
+* [v0.7.3] Also offer related issues/verbatims from Learn pages (no longer just on Azure DevOps work items)
+* [v0.7.3] Get content URL properly from Technical Review work items in Azure DevOps
+* [v0.7.2] Fix for missing Markdown edit link after Learn switched metadata fields (#45)
+* [v0.7.1] Related work item query now only excludes star rating verbatims (#42)
+* [v0.7.1] Azure DevOps: Handle when multiple work item structures exist in page HTML (#40)
+* [v0.7.0] Extract UID from module work items
+* [v0.7.0] While on an Azure DevOps customer feedback work item, extract metadata from the target content page when the extension is activated
 
 ### v0.6
 
