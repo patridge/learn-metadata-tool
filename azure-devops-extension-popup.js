@@ -34,7 +34,7 @@ let displayWorkItemData = async function (workItemData) {
     /**
      * @type {string}
      */
-    let uid = workItemData.UID || workItemData["Module UID"];
+    let uid = workItemData.UID || workItemData["Module UID"] || workItemData["Learning Path UID"];
     if (uid) {
         uidSpan.textContent = uid;
         uidSpan.title = uid;
