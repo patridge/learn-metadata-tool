@@ -201,6 +201,10 @@ let getCurrentPageMetadata = function (rootElement) {
     };
 };
 
+chrome.action.setPopup({
+    popup: "azure-devops-extension-popup.html"
+});
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(`Message received (azure-devops-extension-popup.js): ${request.method}`, request);
     switch (request.method) {
@@ -255,6 +259,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 
+// const getCurrentTab = async function () {
+//     const queryOptions = { active: true, currentWindow: true };
+//     const [tab] = await chrome.tabs.query(queryOptions);
+//     return tab;
+// };
+
 // Have pop-up execute a script in the current tab.
 chrome.tabs.query({ active: true, currentWindow: true },
     function(tabs) {
@@ -266,7 +276,7 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let tabId = activeTab.id;
         let host = tempAnchor.hostname;
         if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
-            chrome.tabs.executeScript(
+            chrome.scripting.executeScript(
                 tabId,
                 {
                     file: azureDevOpsPageScript

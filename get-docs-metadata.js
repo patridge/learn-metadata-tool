@@ -10,9 +10,22 @@
  * @property {string} gitHubNotebookLocation - Module's Notebook location on GitHub, if any (else null)
  */
 
+ chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+    switch (request.method) {
+        case "test":
+            console.log("test received");
+            sendResponse({ result: "handled" });
+            break;
+        default:
+            console.log(`Unknown message received: ${request.method}`);
+            break;
+    }
+});
+
 // NOTE: Had to stuff everything in this immediately executing function to avoid duplicate declaration errors when this script was run every time the pop-up was loaded. Probably a better way to handle this, though.
-(async function () {
-    // storageLocalRemoveAsync([ location ]);
+document.addEventListener('DOMContentLoaded', async function () {
+    return;
+    // NOTE: To clear out any storage for this extension: `storageLocalRemoveAsync([ location ]);`
     /**
      * @param {Document} rootElement - Root element of page to search for metadata
      * @returns {PageMetadata}
@@ -118,6 +131,7 @@
             gitHubNotebookLocation: gitUrlValues.gitNotebookEditUrl,
         };
     };
+
     /**
      * @param {PageMetadata} pageMetadata - Page's gathered metadata
      */
@@ -138,6 +152,16 @@
         );
     };
 
-    var pageMetadata = getCurrentPageMetadata(document);
-    sendPopUpUpdateRequest(pageMetadata);
-})();
+    chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+        switch (request.method) {
+            case "metadataRequested":
+                var pageMetadata = getCurrentPageMetadata(document);
+                sendPopUpUpdateRequest(pageMetadata);
+                sendResponse({ result: "handled" });
+                break;
+            default:
+                console.log(`Unknown message received: ${request.method}`);
+                break;
+        }
+    });
+});
