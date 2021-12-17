@@ -74,6 +74,7 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 ### v0.7
 
+* [v0.7.7] Adjust related issue/verbatim links for more comprehensive results
 * [v0.7.6] Add URL support for Learning Path work items in Azure DevOps
 * [v0.7.5] Add support for notebook embedded content on Learn
 * [v0.7.5] Fix issues when navigating to source links from outside en-us locale
