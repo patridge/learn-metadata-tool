@@ -11,7 +11,7 @@ const defaultLinkIsDisabled = true;
 
 const delay = function (timeInMilliseconds) {
     return new Promise(resolve => setTimeout(resolve, timeInMilliseconds));
-}
+};
 
 const getCustomLink = async function () {
     let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
