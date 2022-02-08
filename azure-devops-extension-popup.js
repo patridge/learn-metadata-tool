@@ -152,41 +152,62 @@ let getCurrentPageMetadata = function (rootElement) {
         // NOTE: Currently limited to Learn in the URL manipulation below, but if notebooks start showing up elsewhere in Docs we'll have to adjust.
         let notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
         let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") : "";
-        if (notebookPublicUrl && notebookPublicUrl.startsWith("/learn/modules")) {
-            // TODO: Make any new relative notebook URLs absolute to match prior expectations.
-            notebookPublicUrl = "https://docs.microsoft.com" + notebookPublicUrl;
-        }
-        // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL.
-        //       GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
-        //       Learn-hosted example: https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
+        // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL, either absolute or file relative..
+        //    GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
+        //    Learn-hosted example: https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
+        //    Learn-hosted file-relative: notebooks/3-neural-network.ipynb
         /** @type string */
         let gitNotebookEditUrl = null;
         if (notebookPublicUrl) {
             if (notebookPublicUrl.startsWith("https://raw.githubusercontent.com/")) {
+                // GitHub-hosted notebook
                 // e.g., "https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/2-understand-audio-data.ipynb" => "https://github.com/MicrosoftDocs/pytorchfundamentals/blob/main/audio-pytorch/2-understand-audio-data.ipynb"
                 let defaultBranchRegex = new RegExp("/(?<branch>(main)|(master))/", "i");
                 gitNotebookEditUrl = notebookPublicUrl.replace(defaultBranchRegex, "/blob/$<branch>/").replace("https://raw.githubusercontent.com/", "https://github.com/");
             }
-            else if (notebookPublicUrl.startsWith("https://docs.microsoft.com/learn/")) {
-                // Fairly certain all Learn modules have a YAML file, so starting from that previously dissected URL.
-                // Assume notebook is in the same content repo as the current Learn module.
-                if (gitYamlEditUrl) {
-                    // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
-
+            else {
+                // Learn-hosted notebook
+                // Make any repo-relative notebook URLs absolute to match prior expectations.
+                if (notebookPublicUrl.startsWith("/learn/modules")) {
+                    // Assume notebook URL is relative to the website root.
+                    // Make URL absolute for next section.
+                    notebookPublicUrl = "https://docs.microsoft.com" + notebookPublicUrl;
+                }
+                else if (!notebookPublicUrl.startsWith("https://")) {
+                    // Assume notebook URL is relative to the current content repo file.
+                    // Get module URL and append relative notebook to make URL absolute for next section.
                     const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
-                    const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") : "";
+                    const currentPageUrl = currentPageUrlTag?.getAttribute("content") || "";
+                    const learnModuleUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/[a-z]{2}-[a-z]{2}/learn/modules/(?<module>[^?#/]*)", "i");
+                    const learnModuleUrl = currentPageUrl.match(learnModuleUrlRegex)?.[0] || "";
 
-                    const learnModuleUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/[a-z]{2}-[a-z]{2}/learn/modules/(?<moduleAndUnit>[^?#]*)", "i");
-                    const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
-                    // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "count-moon-rocks-python-nasa/2-set-up-program"
+                    const pageLocaleRegex = new RegExp("https://(?<domainPortion>(review\.)?docs\.microsoft\.com)(?<localePortion>/[a-z]{2}-[a-z]{2})/", "i");
+                    const learmModuleUrlWithoutLocale = learnModuleUrl.replace(pageLocaleRegex, "https://$<domainPortion>/");
 
-                    const learnNotebookUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/([a-z]{2}-[a-z]{2}/)?learn/modules/(?<notebookPath>[^?#]*)", "i");
-                    const moduleNotebookPathSections = notebookPublicUrl.replace(learnNotebookUrlRegex, "$<notebookPath>");
-                    // e.g., "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb" => "count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                    notebookPublicUrl = `${learmModuleUrlWithoutLocale}/${notebookPublicUrl}`;
+                }
 
-                    const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
-                    gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
-                    // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/master/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                if (notebookPublicUrl.startsWith("https://docs.microsoft.com/learn/")) {
+                    // Fairly certain all Learn modules have a YAML file, so starting from that previously dissected URL.
+                    // Assume notebook is in the same content repo as the current Learn module.
+                    if (gitYamlEditUrl) {
+                        // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+
+                        const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
+                        const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") : "";
+
+                        const learnModuleUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/[a-z]{2}-[a-z]{2}/learn/modules/(?<moduleAndUnit>[^?#]*)", "i");
+                        const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
+                        // e.g., "https://docs.microsoft.com/en-us/learn/modules/count-moon-rocks-python-nasa/2-set-up-program" => "count-moon-rocks-python-nasa/2-set-up-program"
+
+                        const learnNotebookUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/([a-z]{2}-[a-z]{2}/)?learn/modules/(?<notebookPath>[^?#]*)", "i");
+                        const moduleNotebookPathSections = notebookPublicUrl.replace(learnNotebookUrlRegex, "$<notebookPath>");
+                        // e.g., "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb" => "count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+
+                        const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
+                        gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
+                        // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/master/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://docs.microsoft.com/learn/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                    }
                 }
             }
         }
