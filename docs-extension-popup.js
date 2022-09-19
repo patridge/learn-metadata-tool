@@ -106,7 +106,7 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let tempAnchor = document.createElement("a");
         tempAnchor.href = activeTab.url;
         let tabId = activeTab.id;
-        if (tempAnchor.hostname.endsWith("docs.microsoft.com")) {
+        if (tempAnchor.hostname.endsWith("learn.microsoft.com")) {
             chrome.tabs.executeScript(
                 tabId,
                 {
