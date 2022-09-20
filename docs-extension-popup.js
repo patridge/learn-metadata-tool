@@ -103,16 +103,15 @@ chrome.tabs.query({ active: true, currentWindow: true },
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
         const microsoftLearnPageScript = "get-docs-metadata.js";
         let activeTab = tabs[0];
-        let tempAnchor = document.createElement("a");
-        tempAnchor.href = activeTab.url;
+        let tabUrl = activeTab.url;
+        let tabUrlHostUrl = new URL(tabUrl);
+        let host = tabUrlHostUrl.hostname;
         let tabId = activeTab.id;
-        if (tempAnchor.hostname.endsWith("learn.microsoft.com")) {
-            chrome.tabs.executeScript(
-                tabId,
-                {
-                    file: microsoftLearnPageScript
-                }
-            );
+        if (host.endsWith("learn.microsoft.com")) {
+            chrome.scripting.executeScript({
+                target: { tabId },
+                files: [ microsoftLearnPageScript ]
+            });
         }
     }
 );

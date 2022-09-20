@@ -16,17 +16,16 @@ let setPopUpByTabId = function (tabId) {
         let tabId = tab.id;
         let tabUrl = tab.url;
 
-        let tempAnchor = document.createElement("a");
-        tempAnchor.href = tabUrl;
-        let host = tempAnchor.hostname;
+        let tabUrlHostUrl = new URL(tabUrl);
+        let host = tabUrlHostUrl.hostname;
         if (host.endsWith("learn.microsoft.com")) {
-            chrome.browserAction.setPopup({
+            chrome.action.setPopup({
                 tabId: tabId,
                 popup: "docs-extension-popup.html"
             });
         }
         else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
-            chrome.browserAction.setPopup({
+            chrome.action.setPopup({
                 tabId: tabId,
                 popup: "azure-devops-extension-popup.html"
             });
