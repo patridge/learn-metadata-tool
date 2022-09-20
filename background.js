@@ -16,17 +16,16 @@ let setPopUpByTabId = function (tabId) {
         let tabId = tab.id;
         let tabUrl = tab.url;
 
-        let tempAnchor = document.createElement("a");
-        tempAnchor.href = tabUrl;
-        let host = tempAnchor.hostname;
-        if (host.endsWith("docs.microsoft.com")) {
-            chrome.browserAction.setPopup({
+        let tabUrlHostUrl = new URL(tabUrl);
+        let host = tabUrlHostUrl.hostname;
+        if (host.endsWith("learn.microsoft.com")) {
+            chrome.action.setPopup({
                 tabId: tabId,
                 popup: "docs-extension-popup.html"
             });
         }
         else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
-            chrome.browserAction.setPopup({
+            chrome.action.setPopup({
                 tabId: tabId,
                 popup: "azure-devops-extension-popup.html"
             });
@@ -43,12 +42,12 @@ chrome.runtime.onInstalled.addListener(function() {
                     new chrome.declarativeContent.PageStateMatcher({
                         pageUrl: {
                             // We are hoping to allow this extension whenever we can. That includes the following URL examples.
-                            // * Microsoft Docs: https://docs.microsoft.com/en-us/xamarin/essentials/platform-feature-support?context=xamarin/android
-                            // * Microsoft Learn (modules, units): https://docs.microsoft.com/en-us/learn/modules/welcome-to-azure/2-what-is-azure
-                            // * Microsoft Learn Docs: https://review.docs.microsoft.com/learn-docs/docs/support-triage-issues
+                            // * Microsoft Docs: https://learn.microsoft.com/en-us/xamarin/essentials/platform-feature-support?context=xamarin/android
+                            // * Microsoft Learn (modules, units): https://learn.microsoft.com/en-us/training/modules/welcome-to-azure/2-what-is-azure
+                            // * Microsoft Learn Docs: https://review.learn.microsoft.com/learn-docs/docs/support-triage-issues
                             // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
-                            hostSuffix: "docs.microsoft.com",
+                            hostSuffix: "learn.microsoft.com",
                         },
                     })
                 ],

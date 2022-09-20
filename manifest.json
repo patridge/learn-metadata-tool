@@ -2,22 +2,23 @@
   "name": "Microsoft Learn maintenance tool",
   "short_name": "LearnTool",
   "description": "Helping you maintain content on Microsoft Learn and Docs. Extract useful metadata quickly for editing or triage purposes.",
-  "version": "0.7.8",
+  "version": "0.7.10",
   "permissions": [
     "activeTab",
     "tabs",
     "declarativeContent",
     "storage",
-    "*://*.docs.microsoft.com/*"
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.docs.microsoft.com/*",
+    "*://*.learn.microsoft.com/*"
   ],
   "options_page": "options.html",
   "background": {
-    "scripts": [
-      "background.js"
-    ],
-    "persistent": false
+    "service_worker": "background.js"
   },
-  "browser_action": {
+  "action": {
     "default_popup": "docs-extension-popup.html",
     "default_icon": {
       "16": "images/learn-tool16.png",
@@ -32,5 +33,5 @@
     "48": "images/learn-tool48.png",
     "128": "images/learn-tool128.png"
   },
-  "manifest_version": 2
+  "manifest_version": 3
 }
