@@ -290,10 +290,10 @@ chrome.tabs.query({ active: true, currentWindow: true },
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
         const azureDevOpsPageScript = "azdo-helpers.js";
         let activeTab = tabs[0];
-        let tempAnchor = document.createElement("a");
-        tempAnchor.href = activeTab.url;
+        let tabUrl = activeTab.url;
+        let tabUrlHostUrl = new URL(tabUrl);
+        let host = tabUrlHostUrl.hostname;
         let tabId = activeTab.id;
-        let host = tempAnchor.hostname;
         if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
             chrome.tabs.executeScript(
                 tabId,
