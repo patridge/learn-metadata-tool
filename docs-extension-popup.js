@@ -108,6 +108,10 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let host = tabUrlHostUrl.hostname;
         let tabId = activeTab.id;
         if (host.endsWith("learn.microsoft.com")) {
+            chrome.scripting.executeScript({
+                target: { tabId },
+                files: [ microsoftLearnPageScript ]
+            });
         }
     }
 );

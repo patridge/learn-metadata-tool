@@ -295,12 +295,10 @@ chrome.tabs.query({ active: true, currentWindow: true },
         let host = tabUrlHostUrl.hostname;
         let tabId = activeTab.id;
         if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
-            chrome.tabs.executeScript(
-                tabId,
-                {
-                    file: azureDevOpsPageScript
-                }
-            );
+            chrome.scripting.executeScript({
+                target: { tabId },
+                files: [ azureDevOpsPageScript ]
+            });
         }
     }
 );
