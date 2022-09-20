@@ -1,8 +1,0 @@
-{
-    "title": "Learn/Docs Maintenance Browser Extension",
-    "description": "Browser extension to simplify navigation between Learn modules and units, Learn Azure DevOps work items, or Docs content and the content's underlying Markdown, YAML, or notebook files on GitHub. For Learn content, the extension also offers features for simplifying working with customer-reported issues in Azure DevOps.",
-    "videoUrl": "",
-    "categories": ["Learn maintenance","Docs maintenance","Azure DevOps","GitHub"],
-    "languages": ["Javascript","HTML","CSS"],
-    "technologies": ["Browser Extension"]
-  }
