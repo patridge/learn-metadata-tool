@@ -1,0 +1,35 @@
+name: "Publish browser extension"
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # NOTES:
+      # jq --raw-output eliminates quotes from result value
+      # Excluding /.git and /media files from resulting archive
+      # TODO: Grab latest release notes from README
+      # TODO: Create GitHub Release from zip and release notes
+      #       FUTURE?: Confirm no prior release exists with this version
+      #       FUTURE?: Confirming there are release notes for the current version
+      - name: Zip extension contents
+        run: |
+          version=$(jq --raw-output '.version' manifest.json)
+          zip -r "learn-metadata-tool-$version-$version.zip" * -x ".git/*" "media/*"
+
