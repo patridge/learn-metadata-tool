@@ -2,10 +2,7 @@ name: "Publish browser extension"
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -22,14 +19,33 @@ jobs:
       - uses: actions/checkout@v3
 
       # NOTES:
-      # jq --raw-output eliminates quotes from result value
-      # Excluding /.git and /media files from resulting archive
-      # TODO: Grab latest release notes from README
-      # TODO: Create GitHub Release from zip and release notes
-      #       FUTURE?: Confirm no prior release exists with this version
-      #       FUTURE?: Confirming there are release notes for the current version
-      - name: Zip extension contents
+      # * jq --raw-output eliminates quotes from result value
+      # * Excluding /.git and /media files from resulting archive
+      - name: "Zip extension contents"
         run: |
           version=$(jq --raw-output '.version' manifest.json)
-          zip -r "learn-metadata-tool-$version-$version.zip" * -x ".git/*" "media/*"
+          zipPath="learn-metadata-tool-$version.zip"
+          echo $zipPath
+          zip -r $zipPath * -x ".git/*" "media/*"
+          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
 
+      # NOTES:
+      # * Sets to prerelease vs. production release based on branch being `dev`.
+      - name: "Create GitHub Release"
+        uses: ncipollo/release-action
+        with:
+          prerelease: ${{ github.ref == 'refs/heads/dev' }}
+          draft: true
+          tag: $version
+          name: $version
+          bodyFile: "README.md" # TODO: Get just latest release notes from README.md
+          artifacts: $zipPath
+
+      # NOTES:
+      # * Only submits a release when push is to `main` branch
+      - name: "Submit Chrome Web Store release"
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: "echo \"TODO: Make a Chrome release\""
+
+      # FUTURE?: Confirm no prior release exists with this version
+      # FUTURE?: Confirming there are release notes for the current version
