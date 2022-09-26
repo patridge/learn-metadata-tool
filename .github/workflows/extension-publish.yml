@@ -42,8 +42,8 @@ jobs:
 
       # NOTES:
       # * Only submits a release when push is to `main` branch
-      - name: "Submit Chrome Web Store release"
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: "echo \"TODO: Make a Chrome release\""
+      # - name: "Submit Chrome Web Store release"
+      #   if: ${{ github.ref == 'refs/heads/main' }}
+      #   run: "echo \"TODO: Make a Chrome release\""
 
       # FUTURE?: Confirming there are release notes added for the current version being released.
