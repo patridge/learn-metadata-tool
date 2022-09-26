@@ -14,13 +14,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
 
       # NOTES:
       # * jq --raw-output eliminates quotes from result value
       # * Excluding /.git and /media files from resulting archive
       - name: "Zip extension contents"
-        # Checks-out your repository under $GITHUB_WORKSPACE.
-        uses: actions/checkout@v3
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           zipPath="learn-metadata-tool-$version.zip"
