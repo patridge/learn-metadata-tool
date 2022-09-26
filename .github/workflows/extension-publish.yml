@@ -29,7 +29,8 @@ jobs:
           echo $zipPath
           zip -r $zipPath * -x ".git/*" "media/*"
           echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
-          echo "{zip_path=$zipPath}" >> $GITHUB_ENV
+          echo "{EXTENSION_ZIP_PATH=$zipPath}" >> $GITHUB_ENV
+          echo "{EXTENSION_VERSION=$version}" >> $GITHUB_ENV
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
@@ -38,10 +39,10 @@ jobs:
         with:
           prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
-          tag: $version
-          name: $version
+          tag: ${{ env.EXTENSION_VERSION }}
+          name: ${{ env.EXTENSION_VERSION }}
           bodyFile: "README.md" # TODO: Get just latest release notes from README.md
-          artifacts: ${{ env.zip_path }}
+          artifacts: ${{ env.EXTENSION_ZIP_PATH }}
 
       # NOTES:
       # * Only submits a release when push is to `main` branch
