@@ -11,17 +11,16 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
 
       # NOTES:
       # * jq --raw-output eliminates quotes from result value
       # * Excluding /.git and /media files from resulting archive
       - name: "Zip extension contents"
+        # Checks-out your repository under $GITHUB_WORKSPACE.
+        uses: actions/checkout@v3
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           zipPath="learn-metadata-tool-$version.zip"
@@ -31,15 +30,15 @@ jobs:
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
-      - name: "Create GitHub Release"
-        uses: ncipollo/release-action
-        with:
-          prerelease: ${{ github.ref == 'refs/heads/dev' }}
-          draft: true
-          tag: $version
-          name: $version
-          bodyFile: "README.md" # TODO: Get just latest release notes from README.md
-          artifacts: $zipPath
+      # - name: "Create GitHub Release"
+      #   uses: ncipollo/release-action@v1.10.0
+      #   with:
+      #     prerelease: ${{ github.ref == 'refs/heads/dev' }}
+      #     draft: true
+      #     tag: $version
+      #     name: $version
+      #     bodyFile: "README.md" # TODO: Get just latest release notes from README.md
+      #     artifacts: $zipPath
 
       # NOTES:
       # * Only submits a release when push is to `main` branch
@@ -47,5 +46,4 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: "echo \"TODO: Make a Chrome release\""
 
-      # FUTURE?: Confirm no prior release exists with this version
-      # FUTURE?: Confirming there are release notes for the current version
+      # FUTURE?: Confirming there are release notes added for the current version being released.
