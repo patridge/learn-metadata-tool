@@ -39,7 +39,8 @@ jobs:
         with:
           prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
-          tag: "v${{ env.EXTENSION_VERSION }}"
+          #tag: "v${{ env.EXTENSION_VERSION }}"
+          commit: $GITHUB_REF
           name: "v${{ env.EXTENSION_VERSION }}"
           bodyFile: "README.md" # TODO: Get just latest release notes from README.md
           artifacts: ${{ env.EXTENSION_ZIP_PATH }}
