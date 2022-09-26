@@ -31,9 +31,7 @@ jobs:
           echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
           echo "{EXTENSION_ZIP_PATH=$zipPath}" >> $GITHUB_ENV
           echo "{EXTENSION_VERSION=$version}" >> $GITHUB_ENV
-          gitHash=$(git rev-parse --short "$GITHUB_SHA")
-          echo "Hash: $gitHash"
-          echo "{GIT_HASH=$gitHash}" >> $GITHUB_ENV
+          echo "GITHUB_ENV: $GITHUB_ENV"
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
@@ -43,7 +41,7 @@ jobs:
           prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
           #tag: "v${{ env.EXTENSION_VERSION }}"
-          commit: ${{ env.GIT_HASH }}
+          commit: ${{ env.GITHUB_SHA }}
           name: "v${{ env.EXTENSION_VERSION }}"
           bodyFile: "README.md" # TODO: Get just latest release notes from README.md
           artifacts: ${{ env.EXTENSION_ZIP_PATH }}
