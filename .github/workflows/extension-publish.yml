@@ -40,7 +40,7 @@ jobs:
           tag: $version
           name: $version
           bodyFile: "README.md" # TODO: Get just latest release notes from README.md
-          artifacts: $zipPath
+          artifacts: ${$zipPath}
 
       # NOTES:
       # * Only submits a release when push is to `main` branch
