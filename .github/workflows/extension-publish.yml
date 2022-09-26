@@ -32,15 +32,15 @@ jobs:
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
-      # - name: "Create GitHub Release"
-      #   uses: ncipollo/release-action@v1.10.0
-      #   with:
-      #     prerelease: ${{ github.ref == 'refs/heads/dev' }}
-      #     draft: true
-      #     tag: $version
-      #     name: $version
-      #     bodyFile: "README.md" # TODO: Get just latest release notes from README.md
-      #     artifacts: $zipPath
+      - name: "Create GitHub Release"
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          prerelease: ${{ github.ref == 'refs/heads/dev' }}
+          draft: true
+          tag: $version
+          name: $version
+          bodyFile: "README.md" # TODO: Get just latest release notes from README.md
+          artifacts: $zipPath
 
       # NOTES:
       # * Only submits a release when push is to `main` branch
