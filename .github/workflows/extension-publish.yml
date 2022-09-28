@@ -29,7 +29,9 @@ jobs:
           echo $zipPath
           zip -r $zipPath * -x ".git/*" "media/*"
           echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
+          echo $zipPath
           echo "EXTENSION_ZIP_PATH=$zipPath" >> $GITHUB_ENV
+          echo $version
           echo "EXTENSION_VERSION=$version" >> $GITHUB_ENV
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: $EXTENSION_VERSION"
