@@ -34,8 +34,8 @@ jobs:
           echo $version
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
           echo "GITHUB_SHA: $GITHUB_SHA"
-          echo "EXTENSION_VERSION: $env.EXTENSION_VERSION"
-          echo "EXTENSION_ZIP_PATH: $env.EXTENSION_ZIP_PATH"
+          echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
+          echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
 
       - name: "Testing env"
         run: |
@@ -50,7 +50,7 @@ jobs:
         with:
           prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
-          #tag: "v${{ env.EXTENSION_VERSION }}"
+          tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
           name: "v${{ env.EXTENSION_VERSION }}"
           bodyFile: "README.md" # TODO: Get just latest release notes from README.md
