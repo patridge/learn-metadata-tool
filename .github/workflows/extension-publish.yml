@@ -32,7 +32,7 @@ jobs:
           echo $zipPath
           echo "EXTENSION_ZIP_PATH=$zipPath" >> $GITHUB_ENV
           echo $version
-          echo "EXTENSION_VERSION=$version" >> $GITHUB_ENV
+          echo "EXTENSION_VERSION=$(echo $version)" >> $GITHUB_ENV
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: $EXTENSION_VERSION"
           echo "EXTENSION_ZIP_PATH: $EXTENSION_ZIP_PATH"
