@@ -42,6 +42,7 @@ jobs:
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
+          echo $(cat RELEASE_NOTES.md)
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
