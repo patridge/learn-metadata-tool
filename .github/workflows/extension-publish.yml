@@ -30,9 +30,7 @@ jobs:
           version=$(jq --raw-output '.version' manifest.json)
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
           releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo ${releaseNotes} >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          releaseNotes >> RELEASE_NOTES.md
           zipPath="learn-metadata-tool-$version.zip"
           zip -r $zipPath * -x ".git/*" "media/*"
           echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
@@ -43,7 +41,7 @@ jobs:
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
-          echo "RELEASE_NOTES: ${{ env.RELEASE_NOTES }}"
+          echo "RELEASE_NOTES: $(cat RELEASE_NOTES.md)
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
@@ -55,7 +53,7 @@ jobs:
           tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
           name: "v${{ env.EXTENSION_VERSION }}"
-          bodyFile: ${{ env.RELEASE_NOTES }}
+          bodyFile: RELEASE_NOTES.md
           artifacts: ${{ env.EXTENSION_ZIP_PATH }}
 
       # NOTES:
