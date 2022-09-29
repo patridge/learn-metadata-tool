@@ -23,12 +23,14 @@ jobs:
       # * jq --raw-output eliminates quotes from result value.
       # * Excluding /.git and /media files from resulting archive.
       # * Release note extraction is very specific to this project's README structure.
+      #     * Also, had to do special writing of multiline text to GITHUB_ENV.
+      #     * And it didn't like my long descriptive name, now shortened from "EXTENSION_RELEASE_NOTES".
       - name: "Zip extension contents"
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
           releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
-          echo "EXTENSION_RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           echo ${releaseNotes} >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           zipPath="learn-metadata-tool-$version.zip"
@@ -41,7 +43,7 @@ jobs:
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
-          echo "EXTENSION_RELEASE_NOTES: ${{ env.EXTENSION_RELEASE_NOTES }}"
+          echo "RELEASE_NOTES: ${{ env.RELEASE_NOTES }}"
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
