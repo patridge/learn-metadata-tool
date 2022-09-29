@@ -55,7 +55,7 @@ jobs:
           tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
           name: "v${{ env.EXTENSION_VERSION }}"
-          bodyFile: ${{ env.EXTENSION_RELEASE_NOTES }}
+          bodyFile: ${{ env.RELEASE_NOTES }}
           artifacts: ${{ env.EXTENSION_ZIP_PATH }}
 
       # NOTES:
