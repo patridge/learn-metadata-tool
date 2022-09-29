@@ -25,12 +25,12 @@ jobs:
       # * Release note extraction is very specific to this project's README structure.
       #     * Also, had to do special writing of multiline text to GITHUB_ENV.
       #     * And it didn't like my long descriptive name, now shortened from "EXTENSION_RELEASE_NOTES".
+      # releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
+      # echo $releaseNotes >> RELEASE_NOTES.md
       - name: "Zip extension contents"
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
-          # releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
-          # echo $releaseNotes >> RELEASE_NOTES.md
           $(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d) >> RELEASE_NOTES.md
           cat RELEASE_NOTES.md
           zipPath="learn-metadata-tool-$version.zip"
