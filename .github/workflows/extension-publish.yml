@@ -5,7 +5,7 @@ on:
   push:
     branches: [ "main", "dev" ]
   pull_request:
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -20,28 +20,26 @@ jobs:
       - uses: actions/checkout@v3
 
       # NOTES:
-      # * jq --raw-output eliminates quotes from result value
-      # * Excluding /.git and /media files from resulting archive
+      # * jq --raw-output eliminates quotes from result value.
+      # * Excluding /.git and /media files from resulting archive.
+      # * Release note extraction is very specific to this project's README structure.
       - name: "Zip extension contents"
         run: |
           version=$(jq --raw-output '.version' manifest.json)
-          zipPath="learn-metadata-tool-$version.zip"
-          echo $zipPath
-          zip -r $zipPath * -x ".git/*" "media/*"
-          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
-          echo $zipPath
-          echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
-          echo $version
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
-          echo "GITHUB_SHA: $GITHUB_SHA"
-          echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
-          echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
+          releaseNotes=sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d
+          echo "EXTENSION_RELEASE_NOTES=${releaseNotes}" >> $GITHUB_ENV
+          zipPath="learn-metadata-tool-$version.zip"
+          zip -r $zipPath * -x ".git/*" "media/*"
+          echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
+          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
 
       - name: "Testing env"
         run: |
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
+          echo "EXTENSION_RELEASE_NOTES: ${{ env.EXTENSION_RELEASE_NOTES }}"
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
@@ -53,7 +51,7 @@ jobs:
           tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
           name: "v${{ env.EXTENSION_VERSION }}"
-          bodyFile: "README.md" # TODO: Get just latest release notes from README.md
+          bodyFile: ${{ env.EXTENSION_RELEASE_NOTES }}
           artifacts: ${{ env.EXTENSION_ZIP_PATH }}
 
       # NOTES:
