@@ -31,6 +31,7 @@ jobs:
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
           releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
           echo $releaseNotes >> RELEASE_NOTES.md
+          cat RELEASE_NOTES.md
           zipPath="learn-metadata-tool-$version.zip"
           zip -r $zipPath * -x ".git/*" "media/*"
           echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
