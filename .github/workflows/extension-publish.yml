@@ -29,8 +29,9 @@ jobs:
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
-          releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
-          echo $releaseNotes >> RELEASE_NOTES.md
+          # releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
+          # echo $releaseNotes >> RELEASE_NOTES.md
+          $(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d) >> RELEASE_NOTES.md
           cat RELEASE_NOTES.md
           zipPath="learn-metadata-tool-$version.zip"
           zip -r $zipPath * -x ".git/*" "media/*"
