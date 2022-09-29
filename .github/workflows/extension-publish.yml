@@ -25,32 +25,29 @@ jobs:
       # * Release note extraction is very specific to this project's README structure.
       #     * Also, had to do special writing of multiline text to GITHUB_ENV.
       #     * And it didn't like my long descriptive name, now shortened from "EXTENSION_RELEASE_NOTES".
-      # releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
-      # echo $releaseNotes >> RELEASE_NOTES.md
       - name: "Zip extension contents"
         run: |
           version=$(jq --raw-output '.version' manifest.json)
           echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
           sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d >> RELEASE_NOTES.md
-          cat RELEASE_NOTES.md
           zipPath="learn-metadata-tool-$version.zip"
           zip -r $zipPath * -x ".git/*" "media/*"
           echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
-          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
 
       - name: "Testing env"
+        if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
+          echo "dev branch?: ${{ github.ref == 'refs/heads/dev' }}"
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
-          echo $(cat RELEASE_NOTES.md)
+          cat RELEASE_NOTES.md
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
       - name: "Create GitHub Release"
         uses: ncipollo/release-action@v1.10.0
         with:
-          prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
           tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
