@@ -74,6 +74,7 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 ### v0.7
 
+* [v0.7.11] [internal-only] Added system to auto-generate GitHub releases
 * [v0.7.10] New Learn-based icon; migrated to Google-required Chrome Extension manifest v3
 * [v0.7.9] Fix for break after Microsoft Docs => Microsoft Learn rebrand
 * [v0.7.8] Fix for notebook URLs that are relative to the current repo page (#79)
