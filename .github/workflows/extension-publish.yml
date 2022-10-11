@@ -1,0 +1,65 @@
+name: "Publish browser extension"
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ "dev" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # NOTES:
+      # * jq --raw-output eliminates quotes from result value.
+      # * Excluding /.git and /media files from resulting archive.
+      # * Release note extraction is very specific to this project's README structure.
+      #     * Also, had to do special writing of multiline text to GITHUB_ENV.
+      #     * And it didn't like my long descriptive name, now shortened from "EXTENSION_RELEASE_NOTES".
+      # releaseNotes=$(sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d)
+      # echo $releaseNotes >> RELEASE_NOTES.md
+      - name: "Zip extension contents"
+        run: |
+          version=$(jq --raw-output '.version' manifest.json)
+          echo "EXTENSION_VERSION=${version}" >> $GITHUB_ENV
+          sed -n '/^## Release notes/,/^## Roadmap/p' README.md | sed \$d >> RELEASE_NOTES.md
+          cat RELEASE_NOTES.md
+          zipPath="learn-metadata-tool-$version.zip"
+          zip -r $zipPath * -x ".git/*" "media/*"
+          echo "EXTENSION_ZIP_PATH=${zipPath}" >> $GITHUB_ENV
+          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
+
+      - name: "Testing env"
+        run: |
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
+          echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
+          echo $(cat RELEASE_NOTES.md)
+
+      # NOTES:
+      # * Sets to prerelease vs. production release based on branch being `dev`.
+      - name: "Create GitHub Release"
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          prerelease: ${{ github.ref == 'refs/heads/dev' }}
+          draft: true
+          tag: "v${{ env.EXTENSION_VERSION }}"
+          commit: ${{ env.GITHUB_SHA }}
+          name: "v${{ env.EXTENSION_VERSION }}"
+          bodyFile: RELEASE_NOTES.md
+          artifacts: ${{ env.EXTENSION_ZIP_PATH }}
+
+      # NOTES:
+      # * Only submits a release when push is to `main` branch
+      # - name: "Submit Chrome Web Store release"
+      #   if: ${{ github.ref == 'refs/heads/main' }}
+      #   run: "echo \"TODO: Make a Chrome release\""
+
+      # FUTURE?: Confirming there are release notes added for the current version being released.
