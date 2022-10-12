@@ -3,9 +3,7 @@ name: "Publish browser extension"
 # Controls when the workflow will run
 on:
   push:
-    branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "dev" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -42,12 +40,14 @@ jobs:
           echo "EXTENSION_VERSION: ${{ env.EXTENSION_VERSION }}"
           echo "EXTENSION_ZIP_PATH: ${{ env.EXTENSION_ZIP_PATH }}"
           cat RELEASE_NOTES.md
+          echo "dev?: ${{ github.ref == 'refs/heads/dev' }}"
 
       # NOTES:
       # * Sets to prerelease vs. production release based on branch being `dev`.
       - name: "Create GitHub Release"
         uses: ncipollo/release-action@v1.10.0
         with:
+          prerelease: ${{ github.ref == 'refs/heads/dev' }}
           draft: true
           tag: "v${{ env.EXTENSION_VERSION }}"
           commit: ${{ env.GITHUB_SHA }}
