@@ -65,6 +65,7 @@ let displayMetadata = function (metadata) {
     // List of UID prefixes that, if found as we try to assemble the search, should not be used in the search query (making it too ambiguous to be useful).
     // This sometimes impacts non-standard module UIDs and root module pages without a unit suffix portion.
     // Probably others, so we can add as need be. It may justify a customizable list, possibly pulled from a server-side source.
+    // (NOTE: Technically, with the following `.` count logic, anything without a period would never be encountered as a proposed substring to query. Simply added for thoroughness.)
     const uidPrefixSearchBlocklist = [
         "certification",
         "learn",
