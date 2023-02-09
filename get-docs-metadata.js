@@ -33,11 +33,11 @@
         let gitUrlValues = (function (metaTags) {
             // Learn stopped using `original_ref_skeleton_git_url`, likely to align with greater-Docs, so everywhere seems to be using `original_content_git_url` now.
             let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
-            // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/master/learn-docs/docs/support-triage-issues.md" />
+            // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/main/learn-docs/docs/support-triage-issues.md" />
             let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") : "";
             // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
             // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
-            let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
+            let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/main/") : gitUrl;
             /** @type string */
             let gitYamlEditUrl = null;
             /** @type string */
@@ -116,7 +116,7 @@
 
                             const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
                             gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
-                            // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/master/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                            // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/main/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
                         }
                     }
                 }
