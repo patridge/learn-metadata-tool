@@ -4,9 +4,10 @@ module.exports = {
   mode: 'production',
   entry: {
     background: './src/background.js',
-    // Currently using programmatically injected scripts for content and popup.
-    // content: './src/content.ts',
-    // popup: './src/pop-up.ts'
+    azureDevOpsExtensionPopup: './src/azure-devops-extension-popup.js',
+    docsExtensionPopup: './src/docs-extension-popup.js',
+    azdoHelpers: './src/azdo-helpers.js',
+    options: './src/options.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

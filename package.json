@@ -4,7 +4,7 @@
   "description": "Helping you maintain content on Microsoft Learn and Docs. Extract useful metadata quickly for editing or triage purposes.",
   "scripts": {
     "build": "webpack",
-    "postbuild": "cp manifest.json dist/ && mkdir -p dist/icons && cp images/learn-tool*.png dist/icons/ && cp *.html dist/",
+    "postbuild": "cp manifest.json dist/ && mkdir -p dist/icons && cp images/learn-tool*.png dist/icons/ && cp *.html dist/ && cp *.css dist/",
     "test": "jest"
   },
   "devDependencies": {
