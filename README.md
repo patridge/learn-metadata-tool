@@ -1,3 +1,7 @@
+## TODO
+
+* Convert to declaritive content scripts? (https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts, https://stackoverflow.com/a/9916089/48700)
+
 # Learn Maintenance Tool
 
 Determine the author of a given Microsoft Learn or Microsoft Docs page. And quickly navigate to the content in GitHub to propose edits. This tool was created for the Microsoft Learn content team to help triage user-reported feedback to the right maintainer, but anyone is welcome to use it if it helps them.
