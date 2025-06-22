@@ -1,12 +1,14 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 module.exports = {
   mode: 'production',
   entry: {
-    "background": './src/background.js',
-    "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
-    "docs-extension-popup": './src/docs-extension-popup.js',
     "azdo-helpers": './src/azdo-helpers.js',
+    "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
+    "background": './src/background.js',
+    "docs-extension-popup": './src/docs-extension-popup.js',
+    "get-docs-metadata": './src/get-docs-metadata.js',
     "options": './src/options.js',
   },
   output: {
@@ -14,6 +16,13 @@ module.exports = {
     filename: '[name].js',
     libraryTarget: 'umd' // Ensure compatibility with the browser environment
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/js', to: 'js' },
+      ],
+    }),
+  ],
   resolve: {
     extensions: ['.ts', '.js']
   },
