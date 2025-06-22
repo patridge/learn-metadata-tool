@@ -3,11 +3,11 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    background: './src/background.js',
-    azureDevOpsExtensionPopup: './src/azure-devops-extension-popup.js',
-    docsExtensionPopup: './src/docs-extension-popup.js',
-    azdoHelpers: './src/azdo-helpers.js',
-    options: './src/options.js',
+    "background": './src/background.js',
+    "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
+    "docs-extension-popup": './src/docs-extension-popup.js',
+    "azdo-helpers": './src/azdo-helpers.js',
+    "options": './src/options.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
