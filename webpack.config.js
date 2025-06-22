@@ -20,6 +20,10 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/js', to: 'js' },
+        { from: 'manifest.json', to: 'manifest.json' },
+        { from: 'images/learn-tool*.png', to: 'images/[name][ext]' },
+        { from: '*.html', to: '[name].html' },
+        { from: '*.css', to: '[name].css' },
       ],
     }),
   ],
