@@ -9,7 +9,8 @@ module.exports = {
     "background": './src/background.js',
     "docs-extension-popup": './src/docs-extension-popup.js',
     "get-docs-metadata": './src/get-docs-metadata.js',
-    "options": './src/options.js',
+    "options": './src/options.ts',
+    "/js/storage-helpers": './src/js/storage-helpers.ts',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -19,7 +20,7 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/js', to: 'js' },
+        { from: 'src/js/*.js', to: 'js/[name][ext]' },
         { from: 'manifest.json', to: 'manifest.json' },
         { from: 'images/learn-tool*.png', to: 'images/[name][ext]' },
         { from: '*.html', to: '[name].html' },
