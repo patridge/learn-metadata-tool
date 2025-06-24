@@ -1,9 +1,9 @@
-let storageHelper = (() => {
-    let storageSyncGetAsync = function (keysAndDefaults) {
-        let getValue = new Promise((resolve, reject) => {
+export const storageHelper = {
+    storageSyncGetAsync: async (keysAndDefaults: object): Promise<any> => {
+        let getValue = new Promise((resolve) => {
             chrome.storage.sync.get(
                 keysAndDefaults, // NOTE: `null` will get entire contents of storage
-                function (result) {
+                (result) => {
                     // Keys could be a string or an array of strings (or any object to get back an empty result, or null to get all of cache).
                     // Unify to an array regardless.
                     let keyList = Array.isArray(keysAndDefaults) ? [...keysAndDefaults] : [keysAndDefaults];
@@ -21,9 +21,9 @@ let storageHelper = (() => {
             );
         });
         return getValue;
-    };
-    let storageSyncSetAsync = function (items) {
-        let setValue = new Promise((resolve, reject) => {
+    },
+    storageSyncSetAsync: async (items: object): Promise<void> => {
+        let setValue = new Promise<void>((resolve, reject) => {
             chrome.storage.sync.set(
                 items,
                 function () {
@@ -38,10 +38,5 @@ let storageHelper = (() => {
             );
         });
         return setValue;
-    };
-
-    return {
-        storageSyncGetAsync,
-        storageSyncSetAsync
-    };
-})();
+    },
+}

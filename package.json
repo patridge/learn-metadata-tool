@@ -1,22 +1,23 @@
 {
-    "name":"learn-metadata-tool",
-    "version":"0.7.11",
-    "description":"Helping you maintain content on Microsoft Learn and Docs. Extract useful metadata quickly for editing or triage purposes.",
-    "scripts":{
-        "build":"webpack",
-        "test":"jest"
+    "name": "learn-metadata-tool",
+    "version": "0.7.11",
+    "description": "Helping you maintain content on Microsoft Learn and Docs. Extract useful metadata quickly for editing or triage purposes.",
+    "scripts": {
+        "build": "webpack",
+        "test": "jest"
     },
-    "devDependencies":{
-        "@types/chrome":"^0.0.316",
-        "@types/jest":"^29.5.14",
-        "jest":"^29.0.0",
-        "jest-environment-jsdom":"^29.7.0",
-        "jsdom":"^26.1.0",
-        "shx":"^0.4.0",
-        "ts-jest":"^29.3.2",
-        "ts-loader":"^9.0.0",
-        "typescript":"^5.0.0",
-        "webpack":"^5.0.0",
-        "webpack-cli":"^5.0.0"
+    "devDependencies": {
+        "@types/chrome": "^0.0.316",
+        "@types/jest": "^29.5.14",
+        "copy-webpack-plugin": "^13.0.0",
+        "jest": "^29.0.0",
+        "jest-environment-jsdom": "^29.7.0",
+        "jsdom": "^26.1.0",
+        "shx": "^0.4.0",
+        "ts-jest": "^29.3.2",
+        "ts-loader": "^9.0.0",
+        "typescript": "^5.0.0",
+        "webpack": "^5.0.0",
+        "webpack-cli": "^5.0.0"
     }
 }
