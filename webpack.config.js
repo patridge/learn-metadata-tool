@@ -13,9 +13,10 @@ module.exports = {
     "/js/storage-helpers": './src/js/storage-helpers.ts',
   },
   output: {
+    libraryTarget: 'umd', // Ensure compatibility with the browser environment
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
-    libraryTarget: 'umd' // Ensure compatibility with the browser environment
+    clean: true, // Clean the output directory before each build
   },
   plugins: [
     new CopyWebpackPlugin({
