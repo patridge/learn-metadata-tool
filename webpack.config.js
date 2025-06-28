@@ -8,7 +8,7 @@ module.exports = {
     "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
     "background": './src/background.js',
     "docs-extension-popup": './src/docs-extension-popup.js',
-    "get-docs-metadata": './src/get-docs-metadata.js',
+    "get-docs-metadata": './src/get-docs-metadata.ts',
     "options": './src/options.ts',
     "/js/storage-helpers": './src/js/storage-helpers.ts',
   },
