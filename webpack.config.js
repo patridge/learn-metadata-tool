@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    "azdo-helpers": './src/azdo-helpers.js',
+    "azdo-helpers": './src/azdo-helpers.ts',
     "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
     "background": './src/background.js',
     "docs-extension-popup": './src/docs-extension-popup.js',

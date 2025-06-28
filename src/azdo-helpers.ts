@@ -4,7 +4,17 @@
     //     Work item page: https://{organization}.visualstudio.com/{project}/_workitems/edit/{work-item-number}
     //     List page: {organization}.visualstudio.com/{project}/_queries/query/{query-guid}/
 
-    let sendRequestContentPageMessage = function (contentUrl) {
+    interface WorkItemFieldEntry {
+        label: string | null;
+        value: string;
+    }
+    interface WorkItemData {
+        workItemId?: string | null;
+        workItemUrl?: string | null;
+        [key: string]: any;
+    }
+
+    const sendRequestContentPageMessage = function (contentUrl: string | undefined) {
         const messageMethod = "requestLearnContentPage";
         if (!contentUrl || contentUrl === "") {
             // No content URL to ping for metadata.
@@ -34,20 +44,22 @@
             }
         );
     };
-    let isVisible = function (elem) {
-        return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+    const isVisible = function (elem: Element): boolean {
+        return !!((elem as HTMLElement).offsetWidth || (elem as HTMLElement).offsetHeight || elem.getClientRects().length);
     };
-    let getWorkItemData = function () {
-        // NOTE: We were seeing multiple elements under certain circumstances on Azure DevOps with only one visible. All these queries are now filtering based on `isVisible` (borrowed from jQuery, via [Stack Overflow](https://stackoverflow.com/a/33456469/48700)).
-        let workItemId = [...document.querySelectorAll("span[aria-label='ID Field']")].filter(el => isVisible(el))[0]?.textContent;
-        let workItemUrl = [...document.querySelectorAll(".work-item-form a.caption")].filter(el => isVisible(el))[0]?.href;
 
-        let workItemControls = [...document.querySelectorAll(".work-item-form .control")].filter(el => isVisible(el));
-        let fieldsAndValues = [...workItemControls].map((control) => {
-            let labelControl = control.getElementsByClassName("workitemcontrol-label")[0];
-            let inputControl = control.getElementsByTagName("input")[0];
+    const getWorkItemData = function (): WorkItemData {
+        // NOTE: We were seeing multiple elements under certain circumstances on Azure DevOps with only one visible. All these queries are now filtering based on `isVisible` (borrowed from jQuery, via [Stack Overflow](https://stackoverflow.com/a/33456469/48700)).
+        const workItemId = [...document.querySelectorAll("span[aria-label='ID Field']")].filter(el => isVisible(el))[0]?.textContent;
+        const workItemUrlElem = [...document.querySelectorAll(".work-item-form a.caption")].filter(el => isVisible(el))[0] as HTMLAnchorElement | undefined;
+        const workItemUrl = workItemUrlElem?.href;
+
+        const workItemControls = [...document.querySelectorAll(".work-item-form .control")].filter(el => isVisible(el));
+        const fieldsAndValues = workItemControls.map((control): WorkItemFieldEntry | undefined => {
+            const labelControl = control.getElementsByClassName("workitemcontrol-label")[0];
+            const inputControl = control.getElementsByTagName("input")[0] as HTMLInputElement | undefined;
             if (labelControl && inputControl) {
-                let entry = {
+                const entry: WorkItemFieldEntry = {
                     label: labelControl.textContent,
                     value: inputControl.value,
                 };
@@ -60,9 +72,9 @@
                 // console.log({ "msg": "No label or input", control });
             }
         });
-        let fieldsAndValuesAsObject = fieldsAndValues.reduce(
-            (result, item, index) => {
-                if (item) {
+        const fieldsAndValuesAsObject = fieldsAndValues.reduce(
+            (result: { [key: string]: any }, item, index) => {
+                if (item && item.label) {
                     result[item.label] = item.value;
                 }
                 return result;
@@ -71,19 +83,19 @@
         );
 
         return {
-            "workItemId": workItemId,
-            "workItemUrl": workItemUrl,
+            workItemId: workItemId,
+            workItemUrl: workItemUrl,
             ...fieldsAndValuesAsObject
         };
     };
 
-    let sendPopUpUpdateRequest = function (workItemData) {
+    const sendPopUpUpdateRequest = function (workItemData: WorkItemData) {
         chrome.runtime.sendMessage(
             {
                 method: "workItemCollected",
                 data: workItemData
             },
-            function (response) {
+            function (response: any) {
                 if (!response || !response.result) {
                     console.log("DEBUG: 'workItemCollected' sent message result was invalid", response);
                 }
@@ -97,8 +109,8 @@
         );
     };
 
-    let workItemData = getWorkItemData();
+    const workItemData = getWorkItemData();
 
     sendPopUpUpdateRequest(workItemData);
-    sendRequestContentPageMessage(workItemData?.URL);
+    sendRequestContentPageMessage((workItemData as any)?.URL);
 })();
