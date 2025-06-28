@@ -1,32 +1,45 @@
-// NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
-let uidSpan = document.querySelector("#uid");
-let msAuthorSpan = document.getElementById("msAuthor");
-let gitHubAuthorSpan = document.getElementById("gitHubAuthor");
-let msDateSpan = document.getElementById("msDate");
-let contentYamlSourceSpan = document.getElementById("yamlSourceSpan");
-let contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml");
-let contentMarkdownSourceSpan = document.getElementById("markdownSourceSpan");
-let contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown");
-let contentNotebookSourceSpan = document.getElementById("notebookSourceSpan");
-let contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook");
-let relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl");
-let relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl");
-let customLink = document.getElementById("customLink");
-const customLinkSection = document.getElementById("customLinkSection");
+import { storageHelper } from "./js/storage-helpers";
 
-let copyButtons = [...document.getElementsByClassName("copy-field-btn")];
+// NOTE: This script executes in the context of the pop-up itself (vs. below, where we execute a script in the target tab).
+const uidSpan = document.querySelector<HTMLSpanElement>("#uid")!;
+const msAuthorSpan = document.getElementById("msAuthor") as HTMLSpanElement;
+const gitHubAuthorSpan = document.getElementById("gitHubAuthor") as HTMLSpanElement;
+const msDateSpan = document.getElementById("msDate") as HTMLSpanElement;
+const contentYamlSourceSpan = document.getElementById("yamlSourceSpan") as HTMLSpanElement;
+const contentYamlGitUrlAnchor = document.getElementById("repoUrlYaml") as HTMLAnchorElement;
+const contentMarkdownSourceSpan = document.getElementById("markdownSourceSpan") as HTMLSpanElement;
+const contentMarkdownGitUrlAnchor = document.getElementById("repoUrlMarkdown") as HTMLAnchorElement;
+const contentNotebookSourceSpan = document.getElementById("notebookSourceSpan") as HTMLSpanElement;
+const contentNotebookGitUrlAnchor = document.getElementById("repoUrlNotebook") as HTMLAnchorElement;
+const relatedFeedbackWorkItemsQueryUrl = document.getElementById("relatedWorkItemsQueryUrl") as HTMLAnchorElement;
+const relatedVerbatimsWorkItemsQueryUrl = document.getElementById("relatedVerbatimsQueryUrl") as HTMLAnchorElement;
+const customLink = document.getElementById("customLink") as HTMLAnchorElement;
+const customLinkSection = document.getElementById("customLinkSection") as HTMLElement;
+
+const copyButtons = Array.from(document.getElementsByClassName("copy-field-btn")) as HTMLElement[];
 copyButtons.forEach(btn => {
-    btn.addEventListener("click", async function(element) {
+    btn.addEventListener("click", async function(_element) {
         // Find nearest sibling `.copy-field-target` and copying its text to clipboard.
-        let siblingCopyTargets = [...btn.parentElement.parentElement.getElementsByClassName("copy-field-target")];
-        let copyTarget = siblingCopyTargets && siblingCopyTargets[0];
-        let copyValue = copyTarget?.innerText ?? "";
+        const siblingCopyTargets = Array.from(btn.parentElement!.parentElement!.getElementsByClassName("copy-field-target"));
+        const copyTarget = siblingCopyTargets && siblingCopyTargets[0] as HTMLElement | undefined;
+        const copyValue = copyTarget?.innerText ?? "";
         // NOTE: Catching error because it will throw a DOMException ("Document is not focused.") whenever the window isn't focused and we try to copy to clipboard (e.g., debugging in dev tools).
         await navigator.clipboard.writeText(copyValue).catch(error => console.log("Error while trying to copy to clipboard", error));
     });
 });
 
-let displayMetadata = function (metadata) {
+interface PageMetadata {
+    uid: string;
+    msAuthorMetaTagValue: string;
+    gitHubAuthorMetaTagValue: string;
+    msDateMetaTagValue: string;
+    gitHubYamlLocation: string | null;
+    gitHubMarkdownLocation: string | null;
+    gitHubNotebookLocation: string | null;
+    [key: string]: any;
+}
+
+const displayMetadata = function (metadata: PageMetadata): void {
     let uid = metadata.uid;
     uidSpan.textContent = uid;
     msAuthorSpan.textContent = metadata.msAuthorMetaTagValue;
@@ -83,7 +96,7 @@ let displayMetadata = function (metadata) {
     relatedVerbatimsWorkItemsQueryUrl.setAttribute("href", uidMatchVerbatimQuery);
 };
 
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
     switch (request.method) {
         case "metadataCollected":
             displayMetadata(request.data);
@@ -99,14 +112,14 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 
 // Execute a script in the current tab.
 chrome.tabs.query({ active: true, currentWindow: true },
-    function(tabs) {
+    function(tabs: chrome.tabs.Tab[]) {
         // NOTE: This system duplicates a lot of the background.js PageStateMatcher system manually. There is probably a better way.
         const microsoftLearnPageScript = "get-docs-metadata.js";
         let activeTab = tabs[0];
-        let tabUrl = activeTab.url;
+        let tabUrl = activeTab.url!;
         let tabUrlHostUrl = new URL(tabUrl);
         let host = tabUrlHostUrl.hostname;
-        let tabId = activeTab.id;
+        let tabId = activeTab.id!;
         if (host.endsWith("learn.microsoft.com")) {
             chrome.scripting.executeScript({
                 target: { tabId },
@@ -116,7 +129,7 @@ chrome.tabs.query({ active: true, currentWindow: true },
     }
 );
 
-let getCustomLink = async function () {
+const getCustomLink = async function (): Promise<any> {
     let currentSavedCustomLink = await storageHelper.storageSyncGetAsync(
         {
             customLinkLabel: null,
@@ -128,7 +141,7 @@ let getCustomLink = async function () {
     console.log(currentSavedCustomLink);
     return currentSavedCustomLink;
 };
-let displayCustomLink = async () => {
+const displayCustomLink = async (): Promise<void> => {
     customLinkSection.style.display = "none";
     const customLinkDetails = await getCustomLink();
     const showCustomLink = !(customLinkDetails?.isLinkDisabled ?? true);

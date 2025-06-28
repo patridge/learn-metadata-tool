@@ -7,7 +7,7 @@ module.exports = {
     "azdo-helpers": './src/azdo-helpers.ts',
     "azure-devops-extension-popup": './src/azure-devops-extension-popup.js',
     "background": './src/background.js',
-    "docs-extension-popup": './src/docs-extension-popup.js',
+    "docs-extension-popup": './src/docs-extension-popup.ts',
     "get-docs-metadata": './src/get-docs-metadata.ts',
     "options": './src/options.ts',
     "/js/storage-helpers": './src/js/storage-helpers.ts',
