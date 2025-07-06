@@ -1,20 +1,20 @@
 // NOTE: When this was written, we didn't know that a `null` tab ID would use the current tab.
 // TODO: Determine if all the tab query and ID stuff here could instead by replaced with `null` tabId (defaults to current window per docs [https://developer.chrome.com/extensions/tabs#method-executeScript]).
-let setPopUpByTabId = function (tabId) {
+let setPopUpByTabId = function (tabId: number | undefined): void {
     if (!tabId) {
         console.log(`Tab ID (${tabId}) wasn't provided?`);
         return;
     }
 
-    chrome.tabs.get(tabId, function (tab) {
+    chrome.tabs.get(tabId, function (tab: chrome.tabs.Tab) {
         // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
 
         // Sometimes Chrome will record a pair of error messages in the extension log when accessing `tab` that doesn't make sense [yet]. They definitely do not align with tabs being actively edited, though. It seems to happen when reloading the extension and switching tabs via click. (Avoided when switching via Ctrl[+Shift]+Tab for some reason.)
         // > Unchecked runtime.lastError: Tabs cannot be edited right now (user may be dragging a tab).
         // > Error handling response: TypeError: Cannot read property 'id' of undefined
         // A try-catch around these two `tab.*` calls was supposed to keep that noise from polluting the extension log, but didn't appear to help at all.
-        let tabId = tab.id;
-        let tabUrl = tab.url;
+        let tabId = tab.id!;
+        let tabUrl = tab.url!;
 
         let tabUrlHostUrl = new URL(tabUrl);
         let host = tabUrlHostUrl.hostname;
@@ -105,11 +105,11 @@ chrome.runtime.onInstalled.addListener(function() {
 // });
 
 // NOTE: This handles when you switch between tabs to readdress which pop-up is shown.
-chrome.tabs.onActivated.addListener(function (activeInfo) {
+chrome.tabs.onActivated.addListener(function (activeInfo: chrome.tabs.TabActiveInfo) {
     setPopUpByTabId(activeInfo.tabId);
 });
 // NOTE: This handles when you navigate between pages _within_ a tab to readdress which pop-up is shown. (Sometimes, if a page didn't need a pop-up and you navigated to one that should have a pop-up, it wasn't being shown.)
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
     // This gets called a lot! Restrict to only onUpdated calls where the URL in the tab was changed.
     if (changeInfo.url) {
         setPopUpByTabId(tabId);
