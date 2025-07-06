@@ -65,6 +65,8 @@ chrome.runtime.onInstalled.addListener(function() {
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
                             hostSuffix: "visualstudio.com",
                         },
+                    }),
+                    new chrome.declarativeContent.PageStateMatcher({
                         pageUrl: {
                             // We are hoping to allow this extension whenever we can. That includes the following URL examples.
                             // * Azure DevOps (alt location): https://dev.azure.com/
@@ -72,7 +74,7 @@ chrome.runtime.onInstalled.addListener(function() {
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
                             hostSuffix: "dev.azure.com",
                         },
-                    })
+                    }),
                 ],
                 actions: [
                     new chrome.declarativeContent.ShowPageAction()
