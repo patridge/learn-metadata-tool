@@ -16,6 +16,12 @@ let setPopUpByTabId = function (tabId: number | undefined): void {
         let tabId = tab.id!;
         let tabUrl = tab.url!;
 
+        if (!tabUrl || (!tabUrl.startsWith("http://") && !tabUrl.startsWith("https://"))) {
+            // Skip tabs without a valid HTTP(S) URL (e.g., new tab page).
+            console.log(`Tab ID ${tabId} doesn't have a valid URL: ${tabUrl}`);
+            return;
+        }
+
         let tabUrlHostUrl = new URL(tabUrl);
         let host = tabUrlHostUrl.hostname;
         if (host.endsWith("learn.microsoft.com")) {
@@ -35,7 +41,6 @@ let setPopUpByTabId = function (tabId: number | undefined): void {
 
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-        // TODO: Find out if conditions in the array are AND or OR. If OR, we can combine them both (possible example evidence for OR: https://github.com/kudos/combine.fm/blob/8ea8b4d279bf411064cf1328710e8a343fe021d5/chrome/src/background.js#L5-L42).
         chrome.declarativeContent.onPageChanged.addRules([
             {
                 conditions: [
@@ -49,14 +54,7 @@ chrome.runtime.onInstalled.addListener(function() {
                             // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
                             hostSuffix: "learn.microsoft.com",
                         },
-                    })
-                ],
-                actions: [
-                    new chrome.declarativeContent.ShowPageAction()
-                ]
-            },
-            {
-                conditions: [
+                    }),
                     new chrome.declarativeContent.PageStateMatcher({
                         pageUrl: {
                             // We are hoping to allow this extension whenever we can. That includes the following URL examples.
