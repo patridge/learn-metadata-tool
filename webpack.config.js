@@ -40,5 +40,11 @@ module.exports = {
         exclude: /node_modules/
       }
     ]
+  },
+  performance: {
+    assetFilter: function(assetFilename) {
+      // Exclude Font Awesome JS from Webpack's performance warnings
+      return !/font-awesome-all\.min\.js$/.test(assetFilename);
+    }
   }
 };
