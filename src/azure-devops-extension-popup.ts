@@ -166,7 +166,7 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
         let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") || "" : "";
         // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL, either absolute or file relative..
         //    GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
-        //    Learn-hosted example: https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
+        //    Learn-hosted example: https://learn.microsoft.com/training/modules/intro-computer-vision-tensorflow/notebooks/3-train-dense-neural-networks.ipynb
         //    Learn-hosted file-relative: notebooks/3-neural-network.ipynb
         let gitNotebookEditUrl: string | null = null;
         if (notebookPublicUrl) {
@@ -200,22 +200,22 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
                     // Fairly certain all Learn modules have a YAML file, so starting from that previously dissected URL.
                     // Assume notebook is in the same content repo as the current Learn module.
                     if (gitYamlEditUrl) {
-                        // e.g., "https://learn.microsoft.com/en-us/training/modules/count-moon-rocks-python-nasa/2-set-up-program" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                        // e.g., "https://learn.microsoft.com/en-us/training/modules/intro-computer-vision-tensorflow/3-train-dense-neural-networks" => "https://learn.microsoft.com/training/modules/intro-computer-vision-tensorflow/notebooks/3-train-dense-neural-networks.ipynb"
 
                         const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
                         const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") || "" : "";
 
                         const learnModuleUrlRegex = new RegExp("https://(review\.)?learn\.microsoft\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<moduleAndUnit>[^?#]*)", "i");
                         const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
-                        // e.g., "https://learn.microsoft.com/en-us/training/modules/count-moon-rocks-python-nasa/2-set-up-program" => "count-moon-rocks-python-nasa/2-set-up-program"
+                        // e.g., "https://learn.microsoft.com/en-us/training/modules/intro-computer-vision-tensorflow/3-train-dense-neural-networks" => "intro-computer-vision-tensorflow/3-train-dense-neural-networks"
 
                         const learnNotebookUrlRegex = new RegExp("https://(review\.)?docs\.microsoft\.com/([a-z]{2}-[a-z]{2}/)?learn/modules/(?<notebookPath>[^?#]*)", "i");
                         const moduleNotebookPathSections = notebookPublicUrl.replace(learnNotebookUrlRegex, "$<notebookPath>");
-                        // e.g., "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb" => "count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                        // e.g., "https://learn.microsoft.com/training/modules/intro-computer-vision-tensorflow/notebooks/3-train-dense-neural-networks.ipynb" => "intro-computer-vision-tensorflow/notebooks/6-transfer-learning.ipynb"
 
                         const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
                         gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
-                        // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/master/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+                        // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/main/learn-pr/tensorflow/intro-computer-vision-tensorflow/6-transfer-learning.yml#L16" => "https://github.com/MicrosoftDocs/learn-pr/blob/main/learn-pr/tensorflow/intro-computer-vision-tensorflow/notebooks/6-transfer-learning.ipynb"
                     }
                 }
             }
