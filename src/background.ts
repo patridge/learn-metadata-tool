@@ -1,3 +1,22 @@
+const hostPopupMap: { hostSuffix: string; popupHtml: string }[] = [
+    // We are hoping to allow this extension whenever we can. That includes the following URL examples.
+    // * Microsoft Docs: https://learn.microsoft.com/en-us/xamarin/essentials/platform-feature-support?context=xamarin/android
+    // * Microsoft Learn (modules, units): https://learn.microsoft.com/en-us/training/modules/welcome-to-azure/2-what-is-azure
+    // * Microsoft Learn Docs: https://review.learn.microsoft.com/learn-docs/docs/support-triage-issues
+    // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
+    // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
+    { hostSuffix: "learn.microsoft.com", popupHtml: "docs-extension-popup.html" },
+    // * Azure DevOps (current location): https://dev.azure.com/
+    { hostSuffix: "dev.azure.com", popupHtml: "azure-devops-extension-popup.html" },
+    // * Azure DevOps (legacy location): https://*.visualstudio.com/
+    { hostSuffix: "visualstudio.com", popupHtml: "azure-devops-extension-popup.html" },
+];
+
+function getPopupForHost(host: string): string | null {
+    const found = hostPopupMap.find(entry => host.endsWith(entry.hostSuffix));
+    return found?.popupHtml ?? null;
+}
+
 // NOTE: When this was written, we didn't know that a `null` tab ID would use the current tab.
 // TODO: Determine if all the tab query and ID stuff here could instead by replaced with `null` tabId (defaults to current window per docs [https://developer.chrome.com/extensions/tabs#method-executeScript]).
 let setPopUpByTabId = function (tabId: number | undefined): void {
@@ -7,7 +26,7 @@ let setPopUpByTabId = function (tabId: number | undefined): void {
     }
 
     chrome.tabs.get(tabId, function (tab: chrome.tabs.Tab) {
-        // NOTE: This system manually duplicates a lot of what is being done in background.js PageStateMatcher system. There is probably a better way.
+        // Use the tab mapping system to determine which pop-up to show for the current tab.
 
         // Sometimes Chrome will record a pair of error messages in the extension log when accessing `tab` that doesn't make sense [yet]. They definitely do not align with tabs being actively edited, though. It seems to happen when reloading the extension and switching tabs via click. (Avoided when switching via Ctrl[+Shift]+Tab for some reason.)
         // > Unchecked runtime.lastError: Tabs cannot be edited right now (user may be dragging a tab).
@@ -24,16 +43,13 @@ let setPopUpByTabId = function (tabId: number | undefined): void {
 
         let tabUrlHostUrl = new URL(tabUrl);
         let host = tabUrlHostUrl.hostname;
-        if (host.endsWith("learn.microsoft.com")) {
+
+        const popupHtml = getPopupForHost(host);
+        if (popupHtml) {
+            console.log(`Setting pop-up for tab ID ${tabId} to '${popupHtml}' for host '${host}'`);
             chrome.action.setPopup({
                 tabId: tabId,
-                popup: "docs-extension-popup.html"
-            });
-        }
-        else if (host.endsWith("visualstudio.com") || host === "dev.azure.com") {
-            chrome.action.setPopup({
-                tabId: tabId,
-                popup: "azure-devops-extension-popup.html"
+                popup: popupHtml
             });
         }
     });
@@ -43,37 +59,13 @@ chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         chrome.declarativeContent.onPageChanged.addRules([
             {
-                conditions: [
+                conditions: hostPopupMap.map(entry =>
                     new chrome.declarativeContent.PageStateMatcher({
                         pageUrl: {
-                            // We are hoping to allow this extension whenever we can. That includes the following URL examples.
-                            // * Microsoft Docs: https://learn.microsoft.com/en-us/xamarin/essentials/platform-feature-support?context=xamarin/android
-                            // * Microsoft Learn (modules, units): https://learn.microsoft.com/en-us/training/modules/welcome-to-azure/2-what-is-azure
-                            // * Microsoft Learn Docs: https://review.learn.microsoft.com/learn-docs/docs/support-triage-issues
-                            // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
-                            // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
-                            hostSuffix: "learn.microsoft.com",
-                        },
-                    }),
-                    new chrome.declarativeContent.PageStateMatcher({
-                        pageUrl: {
-                            // We are hoping to allow this extension whenever we can. That includes the following URL examples.
-                            // * Azure DevOps: https://*.visualstudio.com/
-                            // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
-                            // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
-                            hostSuffix: "visualstudio.com",
-                        },
-                    }),
-                    new chrome.declarativeContent.PageStateMatcher({
-                        pageUrl: {
-                            // We are hoping to allow this extension whenever we can. That includes the following URL examples.
-                            // * Azure DevOps (alt location): https://dev.azure.com/
-                            // Not super specific here, but may be good enough (other options: https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher).
-                            // We could make a bunch of nearly identical rules for these or catch more than intended and handle edge cases elsewhere in code. So far, we are choosing the later.
-                            hostSuffix: "dev.azure.com",
-                        },
-                    }),
-                ],
+                            hostSuffix: entry.hostSuffix
+                        }
+                    })
+                ),
                 actions: [
                     new chrome.declarativeContent.ShowPageAction()
                 ]
