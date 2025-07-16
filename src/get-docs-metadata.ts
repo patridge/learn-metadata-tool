@@ -1,5 +1,3 @@
-// NOTE: Cannot `@ts-check` typecheck file until we figure out representing `chrome.runtime` in JSDoc. Tried `@type`, `@global`, `@typedef` (more a variable; not a type), `@member/@var`, and `@external`.
-
 interface PageMetadata {
     uid: string;
     msAuthorMetaTagValue: string;
