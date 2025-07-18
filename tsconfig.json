@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES6",
-    "types": ["jest", "chrome"],
+    "types": ["jest", "chrome", "node"],
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "src/__mocks__", "src/__tests__"],

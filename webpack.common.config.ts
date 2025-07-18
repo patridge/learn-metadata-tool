@@ -1,8 +1,8 @@
-const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import path from 'path';
+import webpack from 'webpack';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-module.exports = {
-  mode: 'production',
+const config: webpack.Configuration = {
   entry: {
     "azdo-helpers": './src/azdo-helpers.ts',
     "azure-devops-extension-popup": './src/azure-devops-extension-popup.ts',
@@ -48,3 +48,5 @@ module.exports = {
     }
   }
 };
+
+export default config;
