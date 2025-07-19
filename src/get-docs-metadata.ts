@@ -29,9 +29,9 @@ interface PageMetadata {
             const gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
             // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/main/learn-docs/docs/support-triage-issues.md" />
             const gitUrl = gitUrlTag?.getAttribute("content") ?? "";
-            // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
+            // Switch from the publish branch to the default primary branch. (Currently defaulting to `main`, but any repos on the old `master` convention will likely result in a 404.)
             // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
-            const gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
+            const gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/main/") : gitUrl;
             let gitYamlEditUrl: string | null = null;
             let gitMarkdownEditUrl: string | null = null;
             if (gitEditUrl.endsWith("/index.yml")) {
