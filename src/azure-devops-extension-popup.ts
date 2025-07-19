@@ -132,17 +132,17 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
     let localeCode = localeTag ? localeTag.getAttribute("content")?.toLowerCase() : "en-us";
     let isEnUsLocale = localeCode === "en-us";
     let uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
-    let uid = uidTag ? uidTag.getAttribute("content") || "" : "";
+    let uid = uidTag?.getAttribute("content") ?? "";
     let msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
-    let msAuthor = msAuthorTag ? msAuthorTag.getAttribute("content") || "" : "";
+    let msAuthor = msAuthorTag?.getAttribute("content") ?? "";
     let authorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0];
-    let author = authorTag ? authorTag.getAttribute("content") || "" : "";
+    let author = authorTag?.getAttribute("content") ?? "";
     let msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
-    let msDate = msDateTag ? msDateTag.getAttribute("content") || "" : "";
+    let msDate = msDateTag?.getAttribute("content") ?? "";
     let gitUrlValues = (function (metaTags: HTMLCollectionOf<HTMLMetaElement>) {
         let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
         // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/main/learn-docs/docs/support-triage-issues.md" />
-        let gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") || "" : "";
+        let gitUrl = gitUrlTag?.getAttribute("content") ?? "";
         // Switch from the publish branch to the default primary branch. (Currently defaulting to `main`, but any repos on the old `master` convention will likely result in a 404.)
         // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
         let gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/main/") : gitUrl;
@@ -163,7 +163,7 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
 
         // NOTE: Currently limited to Learn in the URL manipulation below, but if notebooks start showing up elsewhere in Docs we'll have to adjust.
         let notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
-        let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") || "" : "";
+        let notebookPublicUrl = notebookPublicUrlTag?.getAttribute("content") ?? "";
         // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL, either absolute or file relative..
         //    GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
         //    Learn-hosted example: https://learn.microsoft.com/training/modules/intro-computer-vision-tensorflow/notebooks/3-train-dense-neural-networks.ipynb
@@ -186,9 +186,9 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
                     // Assume notebook URL is relative to the current content repo file.
                     // Get module URL and append relative notebook to make URL absolute for next section.
                     const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
-                    const currentPageUrl = currentPageUrlTag?.getAttribute("content") || "";
+                    const currentPageUrl = currentPageUrlTag?.getAttribute("content") ?? "";
                     const learnModuleUrlRegex = new RegExp("https://(review\.)?learn\.microsoft\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<module>[^?#/]*)", "i");
-                    const learnModuleUrl = currentPageUrl.match(learnModuleUrlRegex)?.[0] || "";
+                    const learnModuleUrl = currentPageUrl.match(learnModuleUrlRegex)?.[0] ?? "";
 
                     const pageLocaleRegex = new RegExp("https://(?<domainPortion>(review\.)?learn\.microsoft\.com)(?<localePortion>/[a-z]{2}-[a-z]{2})/", "i");
                     const learmModuleUrlWithoutLocale = learnModuleUrl.replace(pageLocaleRegex, "https://$<domainPortion>/");
@@ -203,7 +203,7 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
                         // e.g., "https://learn.microsoft.com/en-us/training/modules/intro-computer-vision-tensorflow/3-train-dense-neural-networks" => "https://learn.microsoft.com/training/modules/intro-computer-vision-tensorflow/notebooks/3-train-dense-neural-networks.ipynb"
 
                         const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
-                        const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") || "" : "";
+                        const currentPageUrl = currentPageUrlTag?.getAttribute("content") ?? "";
 
                         const learnModuleUrlRegex = new RegExp("https://(review\.)?learn\.microsoft\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<moduleAndUnit>[^?#]*)", "i");
                         const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");

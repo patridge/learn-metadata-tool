@@ -17,17 +17,17 @@ interface PageMetadata {
         const localeCode = localeTag ? localeTag.getAttribute("content")?.toLowerCase() : "en-us";
         const isEnUsLocale = localeCode === "en-us";
         const uidTag = [...metaTags].filter(meta => meta.getAttribute("name") === "uid")[0];
-        const uid = uidTag ? uidTag.getAttribute("content") || "" : "";
+        const uid = uidTag?.getAttribute("content") ?? "";
         const msAuthorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.author")[0];
-        const msAuthor = msAuthorTag ? msAuthorTag.getAttribute("content") || "" : "";
+        const msAuthor = msAuthorTag?.getAttribute("content") ?? "";
         const authorTag = [...metaTags].filter(meta => meta.getAttribute("name") === "author")[0];
-        const author = authorTag ? authorTag.getAttribute("content") || "" : "";
+        const author = authorTag?.getAttribute("content") ?? "";
         const msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
-        const msDate = msDateTag ? msDateTag.getAttribute("content") || "" : "";
+        const msDate = msDateTag?.getAttribute("content") ?? "";
         const gitUrlValues = (function (metaTags: HTMLCollectionOf<HTMLMetaElement>) {
             // ...existing code...
             const gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
-            const gitUrl = gitUrlTag ? gitUrlTag.getAttribute("content") || "" : "";
+            const gitUrl = gitUrlTag?.getAttribute("content") ?? "";
             // ...existing code...
             const gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
             let gitYamlEditUrl: string | null = null;
@@ -47,7 +47,7 @@ interface PageMetadata {
             }
             // ...existing code...
             const notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
-            let notebookPublicUrl = notebookPublicUrlTag ? notebookPublicUrlTag.getAttribute("content") || "" : "";
+            let notebookPublicUrl = notebookPublicUrlTag?.getAttribute("content") ?? "";
             let gitNotebookEditUrl: string | null = null;
             if (notebookPublicUrl) {
                 if (notebookPublicUrl.startsWith("https://raw.githubusercontent.com/")) {
@@ -62,9 +62,9 @@ interface PageMetadata {
                     }
                     else if (!notebookPublicUrl.startsWith("https://")) {
                         const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
-                        const currentPageUrl = currentPageUrlTag?.getAttribute("content") || "";
+                        const currentPageUrl = currentPageUrlTag?.getAttribute("content") ?? "";
                         const learnModuleUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<module>[^?#/]*)", "i");
-                        const learnModuleUrl = currentPageUrl.match(learnModuleUrlRegex)?.[0] || "";
+                        const learnModuleUrl = currentPageUrl.match(learnModuleUrlRegex)?.[0] ?? "";
                         const pageLocaleRegex = new RegExp("https://(?<domainPortion>(review\\.)?learn\\.microsoft\\.com)(?<localePortion>/[a-z]{2}-[a-z]{2})/", "i");
                         const learmModuleUrlWithoutLocale = learnModuleUrl.replace(pageLocaleRegex, "https://$<domainPortion>/");
                         notebookPublicUrl = `${learmModuleUrlWithoutLocale}/${notebookPublicUrl}`;
@@ -72,7 +72,7 @@ interface PageMetadata {
                     if (notebookPublicUrl.startsWith("https://learn.microsoft.com/training/")) {
                         if (gitYamlEditUrl) {
                             const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
-                            const currentPageUrl = currentPageUrlTag ? currentPageUrlTag.getAttribute("content") || "" : "";
+                            const currentPageUrl = currentPageUrlTag.getAttribute("content") ?? "";
                             const learnModuleUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<moduleAndUnit>[^?#]*)", "i");
                             const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
                             const learnNotebookUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/([a-z]{2}-[a-z]{2}/)?training/modules/(?<notebookPath>[^?#]*)", "i");
@@ -109,7 +109,7 @@ interface PageMetadata {
                 data: pageMetadata
             },
             function (response: any) {
-                if (!response || !response.result) {
+                if (!response?.result) {
                     console.log(`DEBUG: 'metadataCollected' sent message result was invalid: ${response}`);
                 }
                 else {

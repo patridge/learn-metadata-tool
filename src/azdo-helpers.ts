@@ -32,7 +32,7 @@
             },
             function (response) {
                 console.log(`'${messageMethod}' response`, response);
-                if (!response || !response.result) {
+                if (!response?.result) {
                     console.error(`'${messageMethod}' message result was invalid`, response);
                 }
                 else if (response.result === "error") {
@@ -96,7 +96,7 @@
                 data: workItemData
             },
             function (response: any) {
-                if (!response || !response.result) {
+                if (!response?.result) {
                     console.log("DEBUG: 'workItemCollected' sent message result was invalid", response);
                 }
                 else if (response.result === "error") {
