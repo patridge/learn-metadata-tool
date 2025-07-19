@@ -1,3 +1,7 @@
+## TODO
+
+* Convert to declaritive content scripts? (https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts, https://stackoverflow.com/a/9916089/48700)
+
 # Learn Maintenance Tool
 
 Determine the author of a given Microsoft Learn or Microsoft Docs page. And quickly navigate to the content in GitHub to propose edits. This tool was created for the Microsoft Learn content team to help triage user-reported feedback to the right maintainer, but anyone is welcome to use it if it helps them.
@@ -74,6 +78,7 @@ For Microsoft Edge, you'll first need to allow installing extensions from other 
 
 ### v0.7
 
+* [v0.7.11] [internal-only] Added system to auto-generate GitHub releases
 * [v0.7.10] New Learn-based icon; migrated to Google-required Chrome Extension manifest v3
 * [v0.7.9] Fix for break after Microsoft Docs => Microsoft Learn rebrand
 * [v0.7.8] Fix for notebook URLs that are relative to the current repo page (#79)

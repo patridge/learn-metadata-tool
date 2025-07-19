@@ -1,0 +1,20 @@
+# Node.js dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.vscode/
+.idea/
+*.iml
+
+# Chrome extension-specific files
+*.pem
