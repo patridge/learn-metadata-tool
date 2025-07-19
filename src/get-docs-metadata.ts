@@ -25,42 +25,56 @@ interface PageMetadata {
         const msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
         const msDate = msDateTag?.getAttribute("content") ?? "";
         const gitUrlValues = (function (metaTags: HTMLCollectionOf<HTMLMetaElement>) {
-            // ...existing code...
+            // Learn stopped using `original_ref_skeleton_git_url`, likely to align with greater-Docs, so everywhere seems to be using `original_content_git_url` now.
             const gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
+            // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/main/learn-docs/docs/support-triage-issues.md" />
             const gitUrl = gitUrlTag?.getAttribute("content") ?? "";
-            // ...existing code...
+            // Switch from the publish branch to the primary branch. This may require updating as we switch to a branch named main in the future.
+            // NOTE: Localized Learn content appears to be only maintained directly in the "live" branch rather than the default. Rewrite to use default branch for en-us content, but keeping "live" for localized content.
             const gitEditUrl = isEnUsLocale ? gitUrl.replace("/live/", "/master/") : gitUrl;
             let gitYamlEditUrl: string | null = null;
             let gitMarkdownEditUrl: string | null = null;
-            // ...existing code...
             if (gitEditUrl.endsWith("/index.yml")) {
+                // Learn has index pages that are generated entirely from a YAML page.
                 gitYamlEditUrl = gitEditUrl;
                 gitMarkdownEditUrl = null;
             }
             else if (gitEditUrl.endsWith(".yml")) {
+                // Learn has other pages with both YAML and MD content contributing to the final HTML output.
                 gitYamlEditUrl = gitEditUrl;
                 gitMarkdownEditUrl = [ ...gitEditUrl.split("/").slice(0, -1), "includes", gitEditUrl.split("/").slice(-1)[0].replace("yml", "md") ].join("/");
             }
             else {
+                // Most of Docs has content and metadata entirely in a Markdown file.
                 gitYamlEditUrl = null;
                 gitMarkdownEditUrl = gitEditUrl;
             }
-            // ...existing code...
+
+            // NOTE: Currently, the `notebook` YAML parameter could either be a GitHub-hosted URL or a Learn-hosted URL, either absolute or file relative..
+            //    GitHub-hosted example: https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/3-visualizations-transforms.ipynb
+            //    Learn-hosted example: https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb
+            //    Learn-hosted file-relative: notebooks/3-neural-network.ipynb
             const notebookPublicUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "notebook")[0];
             let notebookPublicUrl = notebookPublicUrlTag?.getAttribute("content") ?? "";
             let gitNotebookEditUrl: string | null = null;
             if (notebookPublicUrl) {
                 if (notebookPublicUrl.startsWith("https://raw.githubusercontent.com/")) {
-                    // ...existing code...
+                    // GitHub-hosted notebook
+                    // e.g., "https://raw.githubusercontent.com/MicrosoftDocs/pytorchfundamentals/main/audio-pytorch/2-understand-audio-data.ipynb" => "https://github.com/MicrosoftDocs/pytorchfundamentals/blob/main/audio-pytorch/2-understand-audio-data.ipynb"
                     const defaultBranchRegex = new RegExp("/(?<branch>(main)|(master))/", "i");
                     gitNotebookEditUrl = notebookPublicUrl.replace(defaultBranchRegex, "/blob/$<branch>/").replace("https://raw.githubusercontent.com/", "https://github.com/");
                 }
                 else {
-                    // ...existing code...
+                    // Learn-hosted notebook
+                    // Make any repo-relative notebook URLs absolute to match prior expectations.
                     if (notebookPublicUrl.startsWith("/learn/modules")) {
+                        // Assume notebook URL is relative to the website root.
+                        // Make URL absolute for next section.
                         notebookPublicUrl = "https://learn.microsoft.com" + notebookPublicUrl;
                     }
                     else if (!notebookPublicUrl.startsWith("https://")) {
+                        // Assume notebook URL is relative to the current content repo file.
+                        // Get module URL and append relative notebook to make URL absolute for next section.
                         const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
                         const currentPageUrl = currentPageUrlTag?.getAttribute("content") ?? "";
                         const learnModuleUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<module>[^?#/]*)", "i");
@@ -70,15 +84,23 @@ interface PageMetadata {
                         notebookPublicUrl = `${learmModuleUrlWithoutLocale}/${notebookPublicUrl}`;
                     }
                     if (notebookPublicUrl.startsWith("https://learn.microsoft.com/training/")) {
+                        // Fairly certain all Learn modules have a YAML file, so starting from that previously dissected URL.
+                        // Assume notebook is in the same content repo as the current Learn module.
                         if (gitYamlEditUrl) {
+                            // e.g., "https://learn.microsoft.com/en-us/training/modules/count-moon-rocks-python-nasa/2-set-up-program" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
                             const currentPageUrlTag = [...metaTags].filter(meta => meta.getAttribute("property") === "og:url")[0];
                             const currentPageUrl = currentPageUrlTag.getAttribute("content") ?? "";
                             const learnModuleUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/[a-z]{2}-[a-z]{2}/training/modules/(?<moduleAndUnit>[^?#]*)", "i");
                             const moduleAndUnitPathSections = currentPageUrl.replace(learnModuleUrlRegex, "$<moduleAndUnit>");
+                            // e.g., "https://learn.microsoft.com/en-us/training/modules/count-moon-rocks-python-nasa/2-set-up-program" => "count-moon-rocks-python-nasa/2-set-up-program"
+
                             const learnNotebookUrlRegex = new RegExp("https://(review\\.)?learn\\.microsoft\\.com/([a-z]{2}-[a-z]{2}/)?training/modules/(?<notebookPath>[^?#]*)", "i");
                             const moduleNotebookPathSections = notebookPublicUrl.replace(learnNotebookUrlRegex, "$<notebookPath>");
+                            // e.g., "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb" => "count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
+
                             const gitHubEditBaseRegex = new RegExp(`${moduleAndUnitPathSections}.*`, "i");
                             gitNotebookEditUrl = gitYamlEditUrl.replace(gitHubEditBaseRegex, moduleNotebookPathSections);
+                            // e.g., "https://github.com/MicrosoftDocs/learn-pr/blob/main/learn-pr/student-evangelism/count-moon-rocks-python-nasa/2-set-up-program.yml" => "https://learn.microsoft.com/training/modules/count-moon-rocks-python-nasa/notebooks/2-set-up-program.ipynb"
                         }
                     }
                 }

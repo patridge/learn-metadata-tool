@@ -75,10 +75,33 @@ const displayMetadata = function (metadata: PageMetadata): void {
     // e.g., learn.area.module.1-unit -> [ learn.area.module.1-unit, learn.area.module ]
     // NOTE: Not all modules follow the standard of unit UID construction, limiting the usefulness of these searches.
     const uidPeriodCount = (uid.split(".").length - 1);
+    // List of UID prefixes that, if found as we try to assemble the search, should not be used in the search query (making it too ambiguous to be useful).
+    // This sometimes impacts non-standard module UIDs and root module pages without a unit suffix portion.
+    // Probably others, so we can add as need be. It may justify a customizable list, possibly pulled from a server-side source.
+    // (NOTE: Technically, with the following `.` count logic, anything without a period would never be encountered as a proposed substring to query. Simply added for thoroughness.)
+    const uidPrefixSearchBlocklist = [
+        "certification",
+        "learn",
+        "learn.azure",
+        "learn-bizapps",
+        "learn-bizapps.wwl",
+        "learn.languages",
+        "learn-m365",
+        "learn-m365-pr",
+        "learn.mec",
+        "learn.oxford",
+        "learn.powershell",
+        "learn.quantum",
+        "learn.startups",
+        "learn.student-evangelism",
+        "learn.wwl"
+    ];
     let uidSubstrings = [uid];
     if (uidPeriodCount >= 2) {
         let uidWithoutLastSection = uid.slice(0, uid.lastIndexOf("."));
-        uidSubstrings.push(uidWithoutLastSection);
+        if (!uidPrefixSearchBlocklist.some(prefix => prefix === uidWithoutLastSection)) {
+            uidSubstrings.push(uidWithoutLastSection);
+        }
     }
     let uidContainsQueryPortion = uidSubstrings.map(uidSubstring => `[UID] CONTAINS '${uidSubstring}'`).join(" OR ");
     console.log(uidContainsQueryPortion);

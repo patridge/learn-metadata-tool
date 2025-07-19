@@ -140,6 +140,7 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
     let msDateTag = [...metaTags].filter(meta => meta.getAttribute("name") === "ms.date")[0];
     let msDate = msDateTag?.getAttribute("content") ?? "";
     let gitUrlValues = (function (metaTags: HTMLCollectionOf<HTMLMetaElement>) {
+        // Learn stopped using `original_ref_skeleton_git_url`, likely to align with greater-Docs, so everywhere seems to be using `original_content_git_url` now.
         let gitUrlTag = [...metaTags].filter(meta => meta.getAttribute("name") === "original_content_git_url")[0];
         // e.g., <meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/learn-docs/blob/main/learn-docs/docs/support-triage-issues.md" />
         let gitUrl = gitUrlTag?.getAttribute("content") ?? "";
@@ -153,6 +154,7 @@ let getCurrentPageMetadata = function (rootElement: Document): PageMetadata {
             gitYamlEditUrl = gitEditUrl;
             gitMarkdownEditUrl = null;
         } else if (gitEditUrl.endsWith(".yml")) {
+            // Learn has other pages with both YAML and MD content contributing to the final HTML output.
             gitYamlEditUrl = gitEditUrl;
             gitMarkdownEditUrl = [ ...gitEditUrl.split("/").slice(0, -1), "includes", gitEditUrl.split("/").slice(-1)[0].replace("yml", "md") ].join("/");
         } else {
